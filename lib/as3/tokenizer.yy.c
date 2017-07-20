@@ -53,7 +53,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -70,7 +70,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 #endif /* ! C99 */
@@ -186,14 +186,14 @@ extern FILE *as3_in, *as3_out;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-    
+
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
 		{ \
 		/* Undo effects of setting up as3_text. */ \
-        int yyless_macro_arg = (n); \
-        YY_LESS_LINENO(yyless_macro_arg);\
+		int yyless_macro_arg = (n); \
+		YY_LESS_LINENO(yyless_macro_arg);\
 		*yy_cp = (yy_hold_char); \
 		YY_RESTORE_YY_MORE_OFFSET \
 		(yy_c_buf_p) = yy_cp = yy_bp + yyless_macro_arg - YY_MORE_ADJ; \
@@ -243,7 +243,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -330,9 +330,9 @@ void as3_free (void *  );
 #define yy_set_interactive(is_interactive) \
 	{ \
 	if ( ! YY_CURRENT_BUFFER ){ \
-        as3_ensure_buffer_stack (); \
+		as3_ensure_buffer_stack (); \
 		YY_CURRENT_BUFFER_LVALUE =    \
-            as3__create_buffer(as3_in,YY_BUF_SIZE ); \
+			as3__create_buffer(as3_in,YY_BUF_SIZE ); \
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_is_interactive = is_interactive; \
 	}
@@ -340,9 +340,9 @@ void as3_free (void *  );
 #define yy_set_bol(at_bol) \
 	{ \
 	if ( ! YY_CURRENT_BUFFER ){\
-        as3_ensure_buffer_stack (); \
+		as3_ensure_buffer_stack (); \
 		YY_CURRENT_BUFFER_LVALUE =    \
-            as3__create_buffer(as3_in,YY_BUF_SIZE ); \
+			as3__create_buffer(as3_in,YY_BUF_SIZE ); \
 	} \
 	YY_CURRENT_BUFFER_LVALUE->yy_at_bol = at_bol; \
 	}
@@ -1588,7 +1588,7 @@ char *as3_text;
    Part of the swftools package.
 
    Copyright (c) 2008 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -1622,14 +1622,14 @@ static void dbg(const char*format, ...)
     int l;
     va_list arglist;
     if(as3_verbosity<3)
-	return;
+    return;
     va_start(arglist, format);
     vsnprintf(buf, sizeof(buf)-1, format, arglist);
     va_end(arglist);
     l = strlen(buf);
     while(l && buf[l-1]=='\n') {
-	buf[l-1] = 0;
-	l--;
+    buf[l-1] = 0;
+    l--;
     }
     printf("(tokenizer) ");
     printf("%s\n", buf);
@@ -1640,7 +1640,7 @@ static void dbg(const char*format, ...)
 #define YY_CURRENT_BUFFER yy_current_buffer
 #endif
 
-static void*as3_buffer=0;
+static char*as3_buffer=0;
 static int as3_buffer_pos=0;
 static int as3_buffer_len=0;
 void as3_file_input(FILE*fi)
@@ -1699,19 +1699,19 @@ void handleInclude(char*text, int len, char quotes)
         if(i2!=len) text[i2]=0;
         filename = strdup(&text[i1]);
     }
-    
+
     char*fullfilename = find_file(filename, 1);
     enter_file2(filename, fullfilename, YY_CURRENT_BUFFER);
     as3_in = fopen(fullfilename, "rb");
     if (!as3_in) {
-	syntaxerror("Couldn't open include file \"%s\"\n", fullfilename);
+    syntaxerror("Couldn't open include file \"%s\"\n", fullfilename);
     }
 
     as3__switch_to_buffer(as3__create_buffer(as3_in,YY_BUF_SIZE ) );
     //BEGIN(DEFAULT); keep context
 }
 
-static int do_unescape(const char*s, const char*end, char*n) 
+static int do_unescape(const char*s, const char*end, char*n)
 {
     char*o = n;
     int len=0;
@@ -1725,10 +1725,10 @@ static int do_unescape(const char*s, const char*end, char*n)
         if(s==end) syntaxerror("invalid \\ at end of string");
 
         /* handle the various line endings (mac, dos, unix) */
-        if(*s=='\r') { 
-            s++; 
+        if(*s=='\r') {
+            s++;
             if(s==end) break;
-            if(*s=='\n') 
+            if(*s=='\n')
                 s++;
             continue;
         }
@@ -1737,74 +1737,74 @@ static int do_unescape(const char*s, const char*end, char*n)
             continue;
         }
         switch(*s) {
-	    case '\\': if(o) o[len] = '\\';s++;len++; break;
-	    case '"': if(o) o[len] = '"';s++;len++; break;
-	    case '\'': if(o) o[len] = '\'';s++;len++; break;
-	    case 'b': if(o) o[len] = '\b';s++;len++; break;
-	    case 'f': if(o) o[len] = '\f';s++;len++; break;
-	    case 'n': if(o) o[len] = '\n';s++;len++; break;
-	    case 'r': if(o) o[len] = '\r';s++;len++; break;
-	    case 't': if(o) o[len] = '\t';s++;len++; break;
+        case '\\': if(o) o[len] = '\\';s++;len++; break;
+        case '"': if(o) o[len] = '"';s++;len++; break;
+        case '\'': if(o) o[len] = '\'';s++;len++; break;
+        case 'b': if(o) o[len] = '\b';s++;len++; break;
+        case 'f': if(o) o[len] = '\f';s++;len++; break;
+        case 'n': if(o) o[len] = '\n';s++;len++; break;
+        case 'r': if(o) o[len] = '\r';s++;len++; break;
+        case 't': if(o) o[len] = '\t';s++;len++; break;
             case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': {
                 unsigned int num=0;
                 int nr = 0;
-		while(strchr("01234567", *s) && nr<3 && s<end) {
+        while(strchr("01234567", *s) && nr<3 && s<end) {
                     num <<= 3;
                     num |= *s-'0';
                     nr++;
                     s++;
                 }
-                if(num>256) 
+                if(num>256)
                     syntaxerror("octal number out of range (0-255): %d", num);
                 if(o) o[len] = num;len++;
                 continue;
             }
-	    case 'x': case 'u': {
-		int max=2;
-		char bracket = 0;
+        case 'x': case 'u': {
+        int max=2;
+        char bracket = 0;
                 char unicode = 0;
-		if(*s == 'u') {
-		    max = 6;
+        if(*s == 'u') {
+            max = 6;
                     unicode = 1;
                 }
                 s++;
                 if(s==end) syntaxerror("invalid \\u or \\x at end of string");
-		if(*s == '{')  {
+        if(*s == '{')  {
                     s++;
                     if(s==end) syntaxerror("invalid \\u{ at end of string");
-		    bracket=1;
-		}
-		unsigned int num=0;
+            bracket=1;
+        }
+        unsigned int num=0;
                 int nr = 0;
-		while(strchr("0123456789abcdefABCDEF", *s) && (bracket || nr < max) && s<end) {
-		    num <<= 4;
-		    if(*s>='0' && *s<='9') num |= *s - '0';
-		    if(*s>='a' && *s<='f') num |= *s - 'a' + 10;
-		    if(*s>='A' && *s<='F') num |= *s - 'A' + 10;
+        while(strchr("0123456789abcdefABCDEF", *s) && (bracket || nr < max) && s<end) {
+            num <<= 4;
+            if(*s>='0' && *s<='9') num |= *s - '0';
+            if(*s>='a' && *s<='f') num |= *s - 'a' + 10;
+            if(*s>='A' && *s<='F') num |= *s - 'A' + 10;
                     nr++;
-		    s++;
-		}
-		if(bracket) {
+            s++;
+        }
+        if(bracket) {
                     if(*s=='}' && s<end) {
                         s++;
                     } else {
                         syntaxerror("missing terminating '}'");
                     }
-		}
+        }
                 if(unicode) {
                     char*utf8 = getUTF8(num);
                     while(*utf8) {
                         if(o) o[len] = *utf8;utf8++;len++;
                     }
                 } else {
-                    if(num>256) 
+                    if(num>256)
                         syntaxerror("byte out of range (0-255): %d", num);
                     if(o) o[len] = num;len++;
                 }
-		break;
-	    }
+        break;
+        }
             default: {
-	        if(o) {
+            if(o) {
                     o[len+0] = '\\';
                     o[len+1] = *s;
                 }
@@ -1827,7 +1827,7 @@ static string_t string_unescape(const char*in, int l)
     char*n = (char*)malloc(len+1);
     do_unescape(s, end, n);
     string_t out = string_new(n, len);
-    return out; 
+    return out;
 }
 
 static void handleCData(char*s, int len)
@@ -1854,7 +1854,7 @@ static void handleString(char*s, int len)
         s++;len-=2;
     }
     else syntaxerror("String incorrectly terminated");
-    
+
     a3_lval.str = string_unescape(s, len);
 }
 
@@ -2039,12 +2039,12 @@ void initialize_scanner();
 static inline void l() {
     int t;
     for(t=0;t<as3_leng;t++) {
-	if(as3_text[t]=='\n') {
-	    current_line++;
-	    current_column=0;
-	} else {
-	    current_column++;
-	}
+    if(as3_text[t]=='\n') {
+        current_line++;
+        current_column=0;
+    } else {
+        current_column++;
+    }
     }
 }
 /* count the number of columns consumed by this token */
@@ -2069,7 +2069,7 @@ static int tokenerror();
 //Number                       {c();return m(KW_NUMBER);}
 //XMLCOMMENT  <!--([^->]|(-/[^-])|(--/[^>]))*-->
 
-//{XMLCOMMENT}                 
+//{XMLCOMMENT}
 
 
 
@@ -2141,7 +2141,7 @@ extern int as3_wrap (void );
 #endif
 
     static void yyunput (int c,char *buf_ptr  );
-    
+
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -2183,7 +2183,7 @@ static int input (void );
 		int c = '*'; \
 		yy_size_t n; \
 		for ( n = 0; n < max_size && \
-			     (c = getc( as3_in )) != EOF && c != '\n'; ++n ) \
+				 (c = getc( as3_in )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
 		if ( c == '\n' ) \
 			buf[n++] = (char) c; \
@@ -2265,7 +2265,7 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-    
+
 #line 536 "tokenizer.lex"
 
 
@@ -2496,7 +2496,7 @@ case YY_STATE_EOF(XMLTEXT):
 case 23:
 YY_RULE_SETUP
 #line 575 "tokenizer.lex"
-{c(); BEGIN(DEFAULT);return handleregexp();} 
+{c(); BEGIN(DEFAULT);return handleregexp();}
 	YY_BREAK
 case 24:
 /* rule 24 can match eol */
@@ -2601,7 +2601,7 @@ case 37:
 YY_RULE_SETUP
 #line 594 "tokenizer.lex"
 {/* for debugging: generates a tokenizer-level error */
-                              syntaxerror("3rr0r");}
+							  syntaxerror("3rr0r");}
 	YY_BREAK
 case 38:
 /* rule 38 can match eol */
@@ -3088,16 +3088,16 @@ case YY_STATE_EOF(BEGINNING):
 case YY_STATE_EOF(DEFAULT):
 #line 694 "tokenizer.lex"
 {l();
-                              void*b = leave_file();
-			      if (!b) {
-			         yyterminate();
-                                 as3__delete_buffer(YY_CURRENT_BUFFER);
-                                 return m(T_EOF);
-			      } else {
-			          as3__delete_buffer(YY_CURRENT_BUFFER);
-			          as3__switch_to_buffer(b);
-			      }
-			     }
+							  void*b = leave_file();
+				  if (!b) {
+					 yyterminate();
+								 as3__delete_buffer(YY_CURRENT_BUFFER);
+								 return m(T_EOF);
+				  } else {
+					  as3__delete_buffer(YY_CURRENT_BUFFER);
+					  as3__switch_to_buffer(b);
+				  }
+				 }
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
@@ -3245,7 +3245,7 @@ ECHO;
  */
 static int yy_get_next_buffer (void)
 {
-    	register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
+		register char *dest = YY_CURRENT_BUFFER_LVALUE->yy_ch_buf;
 	register char *source = (yytext_ptr);
 	register int number_to_move, i;
 	int ret_val;
@@ -3377,11 +3377,11 @@ static int yy_get_next_buffer (void)
 
 /* yy_get_previous_state - get the state just before the EOB char was reached */
 
-    static yy_state_type yy_get_previous_state (void)
+	static yy_state_type yy_get_previous_state (void)
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-    
+
 	yy_current_state = (yy_start);
 	yy_current_state += YY_AT_BOL();
 
@@ -3412,8 +3412,8 @@ static int yy_get_next_buffer (void)
  */
     static yy_state_type yy_try_NUL_trans  (yy_state_type yy_current_state )
 {
-	register int yy_is_jam;
-    	register char *yy_cp = (yy_c_buf_p);
+    register int yy_is_jam;
+        register char *yy_cp = (yy_c_buf_p);
 
 	register YY_CHAR yy_c = 1;
 	if ( yy_accept[yy_current_state] )
@@ -3433,10 +3433,10 @@ static int yy_get_next_buffer (void)
 	return yy_is_jam ? 0 : yy_current_state;
 }
 
-    static void yyunput (int c, register char * yy_bp )
+	static void yyunput (int c, register char * yy_bp )
 {
-	register char *yy_cp;
-    
+    register char *yy_cp;
+
     yy_cp = (yy_c_buf_p);
 
 	/* undo effects of setting up as3_text */
@@ -3478,9 +3478,9 @@ static int yy_get_next_buffer (void)
 #endif
 
 {
-	int c;
-    
-	*(yy_c_buf_p) = (yy_hold_char);
+    int c;
+
+    *(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
 		{
@@ -3548,17 +3548,17 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- * 
+ *
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void as3_restart  (FILE * input_file )
 {
-    
-	if ( ! YY_CURRENT_BUFFER ){
+
+    if ( ! YY_CURRENT_BUFFER ){
         as3_ensure_buffer_stack ();
-		YY_CURRENT_BUFFER_LVALUE =
+        YY_CURRENT_BUFFER_LVALUE =
             as3__create_buffer(as3_in,YY_BUF_SIZE );
-	}
+    }
 
 	as3__init_buffer(YY_CURRENT_BUFFER,input_file );
 	as3__load_buffer_state( );
@@ -3566,16 +3566,16 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- * 
+ *
  */
     void as3__switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
-    
+
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		as3_pop_buffer_state();
 	 *		as3_push_buffer_state(new_buffer);
-     */
+	 */
 	as3_ensure_buffer_stack ();
 	if ( YY_CURRENT_BUFFER == new_buffer )
 		return;
@@ -3601,7 +3601,7 @@ static int yy_get_next_buffer (void)
 
 static void as3__load_buffer_state  (void)
 {
-    	(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
+		(yy_n_chars) = YY_CURRENT_BUFFER_LVALUE->yy_n_chars;
 	(yytext_ptr) = (yy_c_buf_p) = YY_CURRENT_BUFFER_LVALUE->yy_buf_pos;
 	as3_in = YY_CURRENT_BUFFER_LVALUE->yy_input_file;
 	(yy_hold_char) = *(yy_c_buf_p);
@@ -3610,13 +3610,13 @@ static void as3__load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- * 
+ *
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE as3__create_buffer  (FILE * file, int  size )
 {
-	YY_BUFFER_STATE b;
-    
+    YY_BUFFER_STATE b;
+
 	b = (YY_BUFFER_STATE) as3_alloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in as3__create_buffer()" );
@@ -3639,11 +3639,11 @@ static void as3__load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with as3__create_buffer()
- * 
+ *
  */
     void as3__delete_buffer (YY_BUFFER_STATE  b )
 {
-    
+
 	if ( ! b )
 		return;
 
@@ -3659,7 +3659,7 @@ static void as3__load_buffer_state  (void)
 #ifndef __cplusplus
 extern int isatty (int );
 #endif /* __cplusplus */
-    
+
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a as3_restart() or at EOF.
@@ -3667,9 +3667,9 @@ extern int isatty (int );
     static void as3__init_buffer  (YY_BUFFER_STATE  b, FILE * file )
 
 {
-	int oerrno = errno;
-    
-	as3__flush_buffer(b );
+    int oerrno = errno;
+
+    as3__flush_buffer(b );
 
 	b->yy_input_file = file;
 	b->yy_fill_buffer = 1;
@@ -3684,17 +3684,17 @@ extern int isatty (int );
     }
 
         b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
-    
-	errno = oerrno;
+
+    errno = oerrno;
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- * 
+ *
  */
     void as3__flush_buffer (YY_BUFFER_STATE  b )
 {
-    	if ( ! b )
+		if ( ! b )
 		return;
 
 	b->yy_n_chars = 0;
@@ -3719,11 +3719,11 @@ extern int isatty (int );
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *  
+ *
  */
 void as3_push_buffer_state (YY_BUFFER_STATE new_buffer )
 {
-    	if (new_buffer == NULL)
+		if (new_buffer == NULL)
 		return;
 
 	as3_ensure_buffer_stack();
@@ -3749,11 +3749,11 @@ void as3_push_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *  
+ *
  */
 void as3_pop_buffer_state (void)
 {
-    	if (!YY_CURRENT_BUFFER)
+		if (!YY_CURRENT_BUFFER)
 		return;
 
 	as3__delete_buffer(YY_CURRENT_BUFFER );
@@ -3772,23 +3772,23 @@ void as3_pop_buffer_state (void)
  */
 static void as3_ensure_buffer_stack (void)
 {
-	yy_size_t num_to_alloc;
-    
-	if (!(yy_buffer_stack)) {
+    yy_size_t num_to_alloc;
+
+    if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
 		 * scanner will even need a stack. We use 2 instead of 1 to avoid an
 		 * immediate realloc on the next call.
-         */
+		 */
 		num_to_alloc = 1;
 		(yy_buffer_stack) = (struct yy_buffer_state**)as3_alloc
 								(num_to_alloc * sizeof(struct yy_buffer_state*)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in as3_ensure_buffer_stack()" );
-								  
+
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
-				
+
 		(yy_buffer_stack_max) = num_to_alloc;
 		(yy_buffer_stack_top) = 0;
 		return;
@@ -3816,16 +3816,16 @@ static void as3_ensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- * 
- * @return the newly allocated buffer state object. 
+ *
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE as3__scan_buffer  (char * base, yy_size_t  size )
 {
-	YY_BUFFER_STATE b;
-    
+    YY_BUFFER_STATE b;
+
 	if ( size < 2 ||
-	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
-	     base[size-1] != YY_END_OF_BUFFER_CHAR )
+		 base[size-2] != YY_END_OF_BUFFER_CHAR ||
+		 base[size-1] != YY_END_OF_BUFFER_CHAR )
 		/* They forgot to leave room for the EOB's. */
 		return 0;
 
@@ -3851,22 +3851,22 @@ YY_BUFFER_STATE as3__scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to as3_lex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- * 
+ *
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       as3__scan_bytes() instead.
  */
 YY_BUFFER_STATE as3__scan_string (yyconst char * yystr )
 {
-    
-	return as3__scan_bytes(yystr,strlen(yystr) );
+
+    return as3__scan_bytes(yystr,strlen(yystr) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to as3_lex() will
  * scan from a @e copy of @a bytes.
  * @param bytes the byte buffer to scan
  * @param len the number of bytes in the buffer pointed to by @a bytes.
- * 
+ *
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE as3__scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
@@ -3874,7 +3874,7 @@ YY_BUFFER_STATE as3__scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_le
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n, i;
-    
+
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
 	buf = (char *) as3_alloc(n  );
@@ -3904,7 +3904,7 @@ YY_BUFFER_STATE as3__scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_le
 
 static void yy_fatal_error (yyconst char* msg )
 {
-    	(void) fprintf( stderr, "%s\n", msg );
+		(void) fprintf( stderr, "%s\n", msg );
 	exit( YY_EXIT_FAILURE );
 }
 
@@ -3915,8 +3915,8 @@ static void yy_fatal_error (yyconst char* msg )
 	do \
 		{ \
 		/* Undo effects of setting up as3_text. */ \
-        int yyless_macro_arg = (n); \
-        YY_LESS_LINENO(yyless_macro_arg);\
+		int yyless_macro_arg = (n); \
+		YY_LESS_LINENO(yyless_macro_arg);\
 		as3_text[as3_leng] = (yy_hold_char); \
 		(yy_c_buf_p) = as3_text + yyless_macro_arg; \
 		(yy_hold_char) = *(yy_c_buf_p); \
@@ -3928,16 +3928,16 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- * 
+ *
  */
 int as3_get_lineno  (void)
 {
-        
+
     return as3_lineno;
 }
 
 /** Get the input stream.
- * 
+ *
  */
 FILE *as3_get_in  (void)
 {
@@ -3945,7 +3945,7 @@ FILE *as3_get_in  (void)
 }
 
 /** Get the output stream.
- * 
+ *
  */
 FILE *as3_get_out  (void)
 {
@@ -3953,7 +3953,7 @@ FILE *as3_get_out  (void)
 }
 
 /** Get the length of the current token.
- * 
+ *
  */
 yy_size_t as3_get_leng  (void)
 {
@@ -3961,7 +3961,7 @@ yy_size_t as3_get_leng  (void)
 }
 
 /** Get the current token.
- * 
+ *
  */
 
 char *as3_get_text  (void)
@@ -3971,18 +3971,18 @@ char *as3_get_text  (void)
 
 /** Set the current line number.
  * @param line_number
- * 
+ *
  */
 void as3_set_lineno (int  line_number )
 {
-    
+
     as3_lineno = line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- * 
+ *
  * @see as3__switch_to_buffer
  */
 void as3_set_in (FILE *  in_str )
@@ -4036,8 +4036,8 @@ static int yy_init_globals (void)
 /* as3_lex_destroy is for both reentrant and non-reentrant scanners. */
 int as3_lex_destroy  (void)
 {
-    
-    /* Pop the buffer stack, destroying each element. */
+
+	/* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		as3__delete_buffer(YY_CURRENT_BUFFER  );
 		YY_CURRENT_BUFFER_LVALUE = NULL;

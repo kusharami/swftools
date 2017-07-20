@@ -1,9 +1,9 @@
 /* q.c
 
    Part of the swftools package.
-   
+
    Copyright (c) 2001,2002,2003,2004 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is rfx_free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the rfx_free Software Foundation; either version 2 of the License, or
@@ -83,16 +83,16 @@ static int mem_put_(mem_t*m,const void*data, int length, int null)
 {
     int n = m->pos;
     m->pos += length + (null?1:0);
-    if(m->pos > m->len) { 
+    if(m->pos > m->len) {
         int v1 = (m->pos+63)&~63;
         int v2 = m->len + m->len / 2;
         m->len = v1>v2?v1:v2;
-	m->buffer = m->buffer?(char*)rfx_realloc(m->buffer,m->len):(char*)rfx_alloc(m->len);
+    m->buffer = m->buffer?(char*)rfx_realloc(m->buffer,m->len):(char*)rfx_alloc(m->len);
     }
     assert(n+length <= m->len);
     memcpy(&m->buffer[n], data, length);
     if(null)
-	m->buffer[n + length] = 0;
+    m->buffer[n + length] = 0;
     return n;
 }
 int mem_put(mem_t*m,void*data, int length)
@@ -120,7 +120,7 @@ float medianf(float*a, int n)
     int i,j,l,m;
     float x;
     int k=n&1?n/2:n/2-1;
-    l=0; 
+    l=0;
     m=n-1;
     while(l<m) {
         x=a[k];
@@ -129,12 +129,12 @@ float medianf(float*a, int n)
             while(a[i]<x) i++;
             while(x<a[j]) j--;
             if(i<=j) {
-		//swap
-		float t = a[i];
-		a[i] = a[j];
-		a[j] = t;
+        //swap
+        float t = a[i];
+        a[i] = a[j];
+        a[j] = t;
                 i++;
-		j--;
+        j--;
             }
         } while(i<=j);
         if(j<k) l=i;
@@ -155,7 +155,7 @@ typedef struct _ringbuffer_internal_t
 
 void ringbuffer_init(ringbuffer_t*r)
 {
-    ringbuffer_internal_t*i = (ringbuffer_internal_t*)rfx_calloc(sizeof(ringbuffer_internal_t)); 
+    ringbuffer_internal_t*i = (ringbuffer_internal_t*)rfx_calloc(sizeof(ringbuffer_internal_t));
     memset(r, 0, sizeof(ringbuffer_t));
     r->internal = i;
     i->buffer = (unsigned char*)rfx_alloc(1024);
@@ -166,18 +166,18 @@ int ringbuffer_read(ringbuffer_t*r, void*buf, int len)
     unsigned char* data = (unsigned char*)buf;
     ringbuffer_internal_t*i = (ringbuffer_internal_t*)r->internal;
     if(r->available < len)
-	len = r->available;
+    len = r->available;
     if(!len)
-	return 0;
+    return 0;
     if(i->readpos + len > i->buffersize) {
-	int read1 = i->buffersize-i->readpos;
-	memcpy(data, &i->buffer[i->readpos], read1);
-	memcpy(&data[read1], &i->buffer[0], len - read1);
-	i->readpos = len - read1;
+    int read1 = i->buffersize-i->readpos;
+    memcpy(data, &i->buffer[i->readpos], read1);
+    memcpy(&data[read1], &i->buffer[0], len - read1);
+    i->readpos = len - read1;
     } else {
-	memcpy(data, &i->buffer[i->readpos], len);
-	i->readpos += len;
-	i->readpos %= i->buffersize;
+    memcpy(data, &i->buffer[i->readpos], len);
+    i->readpos += len;
+    i->readpos %= i->buffersize;
     }
     r->available -= len;
     return len;
@@ -186,16 +186,16 @@ void ringbuffer_put(ringbuffer_t*r, void*buf, int len)
 {
     unsigned char* data = (unsigned char*)buf;
     ringbuffer_internal_t*i = (ringbuffer_internal_t*)r->internal;
-    
+
     if(i->buffersize - r->available < len)
     {
-	unsigned char* buf2;
-	int newbuffersize = i->buffersize;
-	int oldavailable = r->available;
-	newbuffersize*=3;newbuffersize/=2; /*grow at least by 50% each time */
+    unsigned char* buf2;
+    int newbuffersize = i->buffersize;
+    int oldavailable = r->available;
+    newbuffersize*=3;newbuffersize/=2; /*grow at least by 50% each time */
 
 	if(newbuffersize < r->available + len)
-	    newbuffersize = r->available + len + 1024;
+		newbuffersize = r->available + len + 1024;
 
 	buf2 = (unsigned char*)rfx_alloc(newbuffersize);
 	ringbuffer_read(r, buf2, r->available);
@@ -205,18 +205,18 @@ void ringbuffer_put(ringbuffer_t*r, void*buf, int len)
 	i->readpos = 0;
 	i->writepos = oldavailable;
 	r->available = oldavailable;
-    }
-    if(i->writepos + len > i->buffersize) {
+	}
+	if(i->writepos + len > i->buffersize) {
 	int read1 = i->buffersize-i->writepos;
 	memcpy(&i->buffer[i->writepos], data, read1);
 	memcpy(&i->buffer[0], &data[read1], len - read1);
 	i->writepos = len - read1;
-    } else {
+	} else {
 	memcpy(&i->buffer[i->writepos], data, len);
 	i->writepos += len;
 	i->writepos %= i->buffersize;
-    }
-    r->available += len;
+	}
+	r->available += len;
 }
 void ringbuffer_clear(ringbuffer_t*r)
 {
@@ -278,10 +278,10 @@ static void up(heap_t*h, int node)
     int parent = node;
     int tmp = node;
     do {
-	node = parent;
-	if(!node) break;
-	parent = (node-1)/2;
-	h->elements[node] = h->elements[parent];
+    node = parent;
+    if(!node) break;
+    parent = (node-1)/2;
+    h->elements[node] = h->elements[parent];
     } while(HEAP_NODE_SMALLER(h, h->elements[parent], node_p));
     h->elements[node] = node_p;
 }
@@ -290,21 +290,21 @@ static void down(heap_t*h, int node)
     void*node_p = h->elements[node];
     int child = node;
     do {
-	node = child;
+    node = child;
 
 	/* determine new child's position */
 	child = node<<1|1;
-	if(child >= h->size) 
-            break;
-        if(child+1 < h->size && HEAP_NODE_SMALLER(h,h->elements[child],h->elements[child+1])) // search for bigger child
-	    child++;
+	if(child >= h->size)
+			break;
+		if(child+1 < h->size && HEAP_NODE_SMALLER(h,h->elements[child],h->elements[child+1])) // search for bigger child
+		child++;
 
-	h->elements[node] = h->elements[child];
+    h->elements[node] = h->elements[child];
     } while(HEAP_NODE_SMALLER(h,node_p, h->elements[child]));
-    
+
     h->elements[node] = node_p;
 }
-void heap_put(heap_t*h, void*e) 
+void heap_put(heap_t*h, void*e)
 {
     int pos = h->size++;
     void*data = rfx_alloc(h->elem_size);
@@ -325,7 +325,7 @@ int heap_size(heap_t*h)
 }
 void* heap_peek(heap_t*h)
 {
-    if(!h || !h->size) 
+    if(!h || !h->size)
         return 0;
     return h->elements[0];
 }
@@ -342,26 +342,26 @@ void heap_dump(heap_t*h, FILE*fi)
 {
     int t;
     for(t=0;t<h->size;t++) {
-	int s;
-	for(s=0;s<=t;s=(s+1)*2-1) {
-	    if(s==t) fprintf(fi,"\n");
-	}
-	//fprintf(fi,"%d ", h->elements[t]->x); //?
+    int s;
+    for(s=0;s<=t;s=(s+1)*2-1) {
+        if(s==t) fprintf(fi,"\n");
+    }
+    //fprintf(fi,"%d ", h->elements[t]->x); //?
     }
 }
 void** heap_flatten(heap_t*h)
 {
     void**nodes = (void**)rfx_alloc((h->size+1)*sizeof(void*));
     void**p = nodes;
-   
-    while(h->size) {
+
+	while(h->size) {
 	/*printf("Heap Size: %d\n", h->size);
 	heap_print(stdout, h);
 	printf("\n");*/
 	*p++ = heap_chopmax(h);
-    }
-    *p++ = 0;
-    return nodes;
+	}
+	*p++ = 0;
+	return nodes;
 }
 
 // ------------------------------- trie --------------------------------------
@@ -377,7 +377,7 @@ static char _trie_put(trielayer_t**t, unsigned const char*id, void*data)
         (*t)->rest = (unsigned char*)strdup((char*)id);
         (*t)->data = data;
         return 0;
-    } 
+    }
     if((*t)->rest && (*t)->rest[0]) {
         // make room: shift whatever's currently in here one node down
         _trie_put(&(*t)->row[(*t)->rest[0]], (*t)->rest+1, (*t)->data);
@@ -387,7 +387,7 @@ static char _trie_put(trielayer_t**t, unsigned const char*id, void*data)
         return _trie_put(&(*t)->row[id[0]], id+1, data);
     } else {
         char overwrite = 0;
-        if((*t)->rest) 
+        if((*t)->rest)
             overwrite = 1;
         (*t)->rest = (unsigned char*)strdup("");
         (*t)->data = data;
@@ -402,7 +402,7 @@ static char _trie_remove(trielayer_t*t, unsigned const char*id)
             t->rest = 0;
             return 1;
         }
-        if(!*id) 
+        if(!*id)
             return 0;
         t = t->row[*id++];
     }
@@ -445,7 +445,7 @@ int trie_contains(trie_t*trie, unsigned const char*id)
     while(t) {
         if(t->rest && !strcmp((char*)t->rest, (char*)id))
             return 1;
-        if(!*id) 
+        if(!*id)
             return 0;
         t = t->row[*id++];
     }
@@ -457,7 +457,7 @@ void* trie_lookup(trie_t*trie, unsigned const char*id)
     while(t) {
         if(t->rest && !strcmp((char*)t->rest, (char*)id))
             return t->data;
-        if(!*id) 
+        if(!*id)
             return 0;
         t = t->row[*id++];
     }
@@ -512,7 +512,7 @@ void _trie_dump(trielayer_t*t, char*buffer, int pos)
     }
 }
 
-void trie_dump(trie_t*t) 
+void trie_dump(trie_t*t)
 {
     char buffer[256];
     _trie_dump(t->start, buffer, 0);
@@ -646,7 +646,7 @@ string_t* string_new4(const char*text)
 
 void string_free(string_t*s)
 {
-    if(!s) 
+    if(!s)
         return;
     s->len = 0;
     if((string_t*)(s->str) == s+1) {
@@ -689,7 +689,7 @@ char* string_escape(string_t*str)
     return s;
 }
 
-unsigned int crc32_add_byte(unsigned int checksum, unsigned char b) 
+unsigned int crc32_add_byte(unsigned int checksum, unsigned char b)
 {
     crc32_init();
     return checksum>>8 ^ crc32[(b^checksum)&0xff];
@@ -771,14 +771,14 @@ int string_equals(string_t*str, const char*text)
 {
     int l = strlen(text);
     if(str->len == l && !memcmp(str->str, text, l))
-	return 1;
+    return 1;
     return 0;
 }
 int string_equals2(string_t*str, string_t*str2)
 {
-    if(str->len == str2->len && !memcmp(str->str, str2->str, str->len))
+	if(str->len == str2->len && !memcmp(str->str, str2->str, str->len))
 	return 1;
-    return 0;
+	return 0;
 }
 
 char* concat2(const char* t1, const char* t2)
@@ -824,7 +824,7 @@ void stringarray_init(stringarray_t*sa, int hashsize)
 {
     stringarray_internal_t*s;
     int t;
-    sa->internal = (stringarray_internal_t*)rfx_calloc(sizeof(stringarray_internal_t)); 
+    sa->internal = (stringarray_internal_t*)rfx_calloc(sizeof(stringarray_internal_t));
     s = (stringarray_internal_t*)sa->internal;
     mem_init(&s->pos);
     s->hash = rfx_calloc(sizeof(stringlist_t*)*hashsize);
@@ -851,10 +851,10 @@ char* stringarray_at(stringarray_t*sa, int pos)
     stringarray_internal_t*s = (stringarray_internal_t*)sa->internal;
     char*p;
     if(pos<0 || pos>=s->num)
-	return 0;
+    return 0;
     p = *(char**)&s->pos.buffer[pos*sizeof(char*)];
     if(p<0)
-	return 0;
+    return 0;
     return p;
 }
 string_t stringarray_at2(stringarray_t*sa, int pos)
@@ -934,68 +934,68 @@ void stringarray_destroy(stringarray_t*sa)
 
 // ------------------------------- type_t -------------------------------
 
-char ptr_equals(const void*o1, const void*o2) 
+char ptr_equals(const void*o1, const void*o2)
 {
     return o1==o2;
 }
-unsigned int ptr_hash(const void*o) 
+unsigned int ptr_hash(const void*o)
 {
     return string_hash3((const char*)&o, sizeof(o));
 }
-void* ptr_dup(const void*o) 
+void* ptr_dup(const void*o)
 {
     return (void*)o;
 }
-void ptr_free(void*o) 
+void ptr_free(void*o)
 {
     return;
 }
 
-char int_equals(const void*o1, const void*o2) 
+char int_equals(const void*o1, const void*o2)
 {
     return o1==o2;
 }
-unsigned int int_hash(const void*o) 
+unsigned int int_hash(const void*o)
 {
     return string_hash3((const char*)&o, sizeof(o));
 }
-void* int_dup(const void*o) 
+void* int_dup(const void*o)
 {
     return (void*)o;
 }
-void int_free(void*o) 
+void int_free(void*o)
 {
     return;
 }
 
-char charptr_equals(const void*o1, const void*o2) 
+char charptr_equals(const void*o1, const void*o2)
 {
     if(!o1 || !o2)
         return o1==o2;
     return !strcmp(o1,o2);
 }
-unsigned int charptr_hash(const void*o) 
+unsigned int charptr_hash(const void*o)
 {
     if(!o)
         return 0;
     return string_hash2(o);
 }
-void* charptr_dup(const void*o) 
+void* charptr_dup(const void*o)
 {
     if(!o)
         return 0;
     return strdup(o);
 }
-void charptr_free(void*o) 
+void charptr_free(void*o)
 {
     if(o) {
         rfx_free(o);
     }
 }
 
-char stringstruct_equals(const void*o1, const void*o2) 
+char stringstruct_equals(const void*o1, const void*o2)
 {
-    if(!o1 || !o2) 
+    if(!o1 || !o2)
         return o1==o2;
     string_t*s1 = (string_t*)o1;
     string_t*s2 = (string_t*)o2;
@@ -1006,7 +1006,7 @@ char stringstruct_equals(const void*o1, const void*o2)
     else
         return s1->len==s2->len;
 }
-unsigned int stringstruct_hash(const void*o) 
+unsigned int stringstruct_hash(const void*o)
 {
     if(!o) return 0;
     return string_hash(o);
@@ -1027,43 +1027,44 @@ string_t*string_dup3(string_t*o)
     ((char*)s->str)[s->len]=0;
     return s;
 }
-void stringstruct_free(void*o) 
+void stringstruct_free(void*o)
 {
     if(o)
         string_free(o);
 }
 
 type_t int_type = {
-    equals: int_equals,
-    hash: int_hash,
-    dup: int_dup,
-    free: int_free,
+    int_equals,
+    int_hash,
+    int_dup,
+    int_free,
 };
 
 type_t ptr_type = {
-    equals: ptr_equals,
-    hash: ptr_hash,
-    dup: ptr_dup,
-    free: ptr_free,
+    ptr_equals,
+    ptr_hash,
+    ptr_dup,
+    ptr_free,
 };
 
 type_t charptr_type = {
-    equals: charptr_equals,
-    hash: charptr_hash,
-    dup: charptr_dup,
-    free: charptr_free,
+    charptr_equals,
+    charptr_hash,
+    charptr_dup,
+    charptr_free,
 };
 
 type_t stringstruct_type = {
-    equals: stringstruct_equals,
-    hash: stringstruct_hash,
-    dup: (dup_func)string_dup3,
-    free: stringstruct_free,
+    stringstruct_equals,
+    stringstruct_hash,
+    (dup_func)string_dup3,
+    stringstruct_free,
 };
 
 // ------------------------------- dictionary_t -------------------------------
 
 #define INITIAL_SIZE 1
+#undef max
 
 static int max(int x, int y) {
     return x>y?x:y;
@@ -1082,7 +1083,7 @@ dict_t*dict_new2(type_t*t)
     d->key_type = t;
     return d;
 }
-void dict_init(dict_t*h, int size) 
+void dict_init(dict_t*h, int size)
 {
     memset(h, 0, sizeof(dict_t));
     h->hashsize = size;
@@ -1090,7 +1091,7 @@ void dict_init(dict_t*h, int size)
     h->num = 0;
     h->key_type = &charptr_type;
 }
-void dict_init2(dict_t*h, type_t*t, int size) 
+void dict_init2(dict_t*h, type_t*t, int size)
 {
     memset(h, 0, sizeof(dict_t));
     h->hashsize = size;
@@ -1124,7 +1125,7 @@ static void dict_expand(dict_t*h, int newlen)
 {
     assert(h->hashsize < newlen);
     dictentry_t**newslots = (dictentry_t**)rfx_calloc(sizeof(dictentry_t*)*newlen);
-    int t; 
+    int t;
     for(t=0;t<h->hashsize;t++) {
         dictentry_t*e = h->slots[t];
         while(e) {
@@ -1145,12 +1146,12 @@ dictentry_t* dict_put(dict_t*h, const void*key, void* data)
 {
     unsigned int hash = h->key_type->hash(key);
     dictentry_t*e = (dictentry_t*)rfx_alloc(sizeof(dictentry_t));
-    
+
     if(!h->hashsize)
         dict_expand(h, 1);
 
     unsigned int hash2 = hash % h->hashsize;
-    
+
     e->key = h->key_type->dup(key);
     e->hash = hash; //for resizing
     e->next = h->slots[hash2];
@@ -1159,7 +1160,7 @@ dictentry_t* dict_put(dict_t*h, const void*key, void* data)
     h->num++;
     return e;
 }
-void dict_put2(dict_t*h, const char*s, void*data) 
+void dict_put2(dict_t*h, const char*s, void*data)
 {
     assert(h->key_type == &charptr_type);
     dict_put(h, s, data);
@@ -1190,7 +1191,7 @@ static inline dictentry_t* dict_do_lookup(dict_t*h, const void*key)
     if(!h->num) {
         return 0;
     }
-    
+
     unsigned int ohash = h->key_type->hash(key);
     unsigned int hash = ohash % h->hashsize;
 
@@ -1366,12 +1367,12 @@ void dict_free_all(dict_t*h, char free_keys, void (*free_data_function)(void*))
     memset(h, 0, sizeof(dict_t));
 }
 
-void dict_clear_shallow(dict_t*h) 
+void dict_clear_shallow(dict_t*h)
 {
     dict_free_all(h, 0, 0);
 }
 
-void dict_clear(dict_t*h) 
+void dict_clear(dict_t*h)
 {
     dict_free_all(h, 1, 0);
 }
@@ -1402,18 +1403,18 @@ void mtf_increase(mtf_t*m, const void*key)
     mtf_item_t*item = m->first;
     mtf_item_t*last = 0;
     while(item) {
-	if(m->type->equals(item->key, key)) {
-	    item->num++;
-	    if(item->num>m->first->num) {
-		if(last) last->next = item->next;
-		else m->first = item->next;
-		item->next = m->first;
-		m->first = item;
-	    }
+    if(m->type->equals(item->key, key)) {
+        item->num++;
+        if(item->num>m->first->num) {
+        if(last) last->next = item->next;
+        else m->first = item->next;
+        item->next = m->first;
+        m->first = item;
+        }
             return;
-	}
-	last = item;
-	item = item->next;
+    }
+    last = item;
+    item = item->next;
     }
     NEW(mtf_item_t,n);
     if(last) last->next = n;
@@ -1427,10 +1428,10 @@ void mtf_destroy(mtf_t*m)
     mtf_item_t*item = m->first;
     m->first = 0;
     while(item) {
-	mtf_item_t*next = item->next;
-	item->next = 0;
-	free(item);
-	item = next;
+    mtf_item_t*next = item->next;
+    item->next = 0;
+    free(item);
+    item = next;
     }
     free(m);
 }
@@ -1505,38 +1506,38 @@ array_t* array_new2(type_t*type) {
     return d;
 }
 void*array_getkey(array_t*array, int nr) {
-    if(nr >= array->num || nr<0) {
+	if(nr >= array->num || nr<0) {
 	fprintf(stderr, "error: reference to element %d in array[%d]\n", nr, array->num);
 	return 0;
-    }
-    return array->d[nr].name;
+	}
+	return array->d[nr].name;
 }
 void*array_getvalue(array_t*array, int nr) {
-    if(nr >= array->num || nr<0) {
+	if(nr >= array->num || nr<0) {
 	fprintf(stderr, "error: reference to element %d in array[%d]\n", nr, array->num);
 	return 0;
-    }
-    return array->d[nr].data;
+	}
+	return array->d[nr].data;
 }
 int array_append(array_t*array, const void*name, void*data) {
-    while(array->size <= array->num) {
+	while(array->size <= array->num) {
 	array->size += 64;
 	if(!array->d) {
-	    array->d = malloc(sizeof(array_entry_t)*array->size);
+		array->d = malloc(sizeof(array_entry_t)*array->size);
 	} else {
-	    array->d = realloc(array->d, sizeof(array_entry_t)*array->size);
+		array->d = realloc(array->d, sizeof(array_entry_t)*array->size);
 	}
-    }
+	}
 
-    dictentry_t*e = dict_put(array->entry2pos, name, (void*)(ptroff_t)(array->num+1));
+	dictentry_t*e = dict_put(array->entry2pos, name, (void*)(ptroff_t)(array->num+1));
 
-    if(name) {
+	if(name) {
 	array->d[array->num].name = e->key;
-    } else {
+	} else {
 	array->d[array->num].name = 0;
-    }
-    array->d[array->num].data = (void*)data;
-    return array->num++;
+	}
+	array->d[array->num].data = (void*)data;
+	return array->num++;
 }
 int array_find(array_t*array, const void*name)
 {
@@ -1560,15 +1561,15 @@ int array_find2(array_t*array, const void*name, void*data)
 int array_update(array_t*array, const void*name, void*data) {
     int pos = array_find(array, name);
     if(pos>=0) {
-	array->d[pos].data = data;
-	return pos;
+    array->d[pos].data = data;
+    return pos;
     }
     return array_append(array, name, data);
 }
 int array_append_if_new(array_t*array, const void*name, void*data) {
     int pos = array_find(array, name);
     if(pos>=0)
-	return pos;
+    return pos;
     return array_append(array, name, data);
 }
 void array_free(array_t*array) {
@@ -1648,7 +1649,7 @@ void list_prepend_(void*_list, void*entry)
     (*list)->info[0].last = last;
     (*list)->info[0].size = size+1;
 }
-void list_free_(void*_list) 
+void list_free_(void*_list)
 {
     commonlist_t**list = (commonlist_t**)_list;
     commonlist_t*l = *list;
@@ -1673,7 +1674,7 @@ void list_deep_free_(void*_list)
     }
     *list = 0;
 }
-void*list_clone_(void*_list) 
+void*list_clone_(void*_list)
 {
     commonlist_t*l = *(commonlist_t**)_list;
 

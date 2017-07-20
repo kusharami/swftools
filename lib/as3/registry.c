@@ -6,7 +6,7 @@
    Part of the swftools package.
 
    Copyright (c) 2008 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -60,16 +60,16 @@ static void* dummy_clone(void*other) {return other;}
 static void dummy_destroy(slotinfo_t*c) {}
 
 type_t slotinfo_type = {
-    hash: (hash_func)slotinfo_hash,
-    equals: (equals_func)slotinfo_equals,
-    dup: (dup_func)dummy_clone, // all signatures are static
-    free: (free_func)dummy_destroy,
+    (equals_func)slotinfo_equals,
+    (hash_func)slotinfo_hash,
+    (dup_func)dummy_clone, // all signatures are static
+    (free_func)dummy_destroy,
 };
 type_t memberinfo_type = {
-    hash: (hash_func)memberinfo_hash,
-    equals: (equals_func)slotinfo_equals,
-    dup: (dup_func)dummy_clone, // all signatures are static
-    free: (free_func)dummy_destroy,
+    (equals_func)slotinfo_equals,
+    (hash_func)memberinfo_hash,
+    (dup_func)dummy_clone, // all signatures are static
+    (free_func)dummy_destroy,
 };
 
 // ----------------------- assets -------------------------------------
@@ -78,42 +78,42 @@ static void use_asset(asset_bundle_t*a)
     a->used = 1;
     asset_bundle_list_t*l = a->dependencies;
     while(l) {
-	if(!l->asset_bundle->used) {
-	    use_asset(l->asset_bundle);
-	}
-	l = l->next;
+    if(!l->asset_bundle->used) {
+        use_asset(l->asset_bundle);
+    }
+    l = l->next;
     }
 }
 void registry_use(slotinfo_t*s)
 {
     if(!s) return;
     if(!(s->flags&FLAG_USED)) {
-	s->flags |= FLAG_USED;
-	if(s->kind == INFOTYPE_CLASS) {
-	    classinfo_t*c=(classinfo_t*)s;
-	    if(c->assets) {
-		use_asset(c->assets);
-	    }
-	    int t=0;
-	    while(c->interfaces[t]) {
-		registry_use((slotinfo_t*)c->interfaces[t]);
-		t++;
-	    }
-	    while(c->superclass) {
-		c = c->superclass;
-		registry_use((slotinfo_t*)c);
-	    }
-	} else if(s->kind == INFOTYPE_METHOD) {
-	    methodinfo_t*m=(methodinfo_t*)s;
-	    if(m->parent) {
-		registry_use((slotinfo_t*)m->parent);
-	    }
-	} else if(s->kind == INFOTYPE_VAR) {
-	    varinfo_t*v=(varinfo_t*)s;
-	    if(v->parent) {
-		registry_use((slotinfo_t*)v->parent);
-	    }
-	}
+    s->flags |= FLAG_USED;
+    if(s->kind == INFOTYPE_CLASS) {
+        classinfo_t*c=(classinfo_t*)s;
+        if(c->assets) {
+        use_asset(c->assets);
+        }
+        int t=0;
+        while(c->interfaces[t]) {
+        registry_use((slotinfo_t*)c->interfaces[t]);
+        t++;
+        }
+        while(c->superclass) {
+        c = c->superclass;
+        registry_use((slotinfo_t*)c);
+        }
+    } else if(s->kind == INFOTYPE_METHOD) {
+        methodinfo_t*m=(methodinfo_t*)s;
+        if(m->parent) {
+        registry_use((slotinfo_t*)m->parent);
+        }
+    } else if(s->kind == INFOTYPE_VAR) {
+        varinfo_t*v=(varinfo_t*)s;
+        if(v->parent) {
+        registry_use((slotinfo_t*)v->parent);
+        }
+    }
     }
 }
 void registry_add_asset(asset_bundle_t*bundle)
@@ -167,13 +167,13 @@ static void resolve_on_class(slotinfo_t*_cls)
 {
     classinfo_t*cls = (classinfo_t*)_cls;
     cls->superclass = (classinfo_t*)registry_resolve((slotinfo_t*)cls->superclass);
-	
-    DICT_ITERATE_DATA(&cls->members,slotinfo_t*,m) {
+
+	DICT_ITERATE_DATA(&cls->members,slotinfo_t*,m) {
 	resolve_on_slot(m);
-    }
-    DICT_ITERATE_DATA(&cls->static_members,slotinfo_t*,m2) {
+	}
+	DICT_ITERATE_DATA(&cls->static_members,slotinfo_t*,m2) {
 	resolve_on_slot(m2);
-    }
+	}
 
     int t=0;
     while(cls->interfaces[t]) {
@@ -223,10 +223,10 @@ methodinfo_t* methodinfo_register_onclass(classinfo_t*cls, U8 access, const char
     m->name = name;
     m->package = ns;
     m->parent = cls;
-    if(!is_static) 
-	dict_put(&cls->members, m, m);
+    if(!is_static)
+    dict_put(&cls->members, m, m);
     else
-	dict_put(&cls->static_members, m, m);
+    dict_put(&cls->static_members, m, m);
     return m;
 }
 varinfo_t* varinfo_register_onclass(classinfo_t*cls, U8 access, const char*ns, const char*name, char is_static)
@@ -237,10 +237,10 @@ varinfo_t* varinfo_register_onclass(classinfo_t*cls, U8 access, const char*ns, c
     m->name = name;
     m->package = ns;
     m->parent = cls;
-    if(!is_static) 
-	dict_put(&cls->members, m, m);
+    if(!is_static)
+    dict_put(&cls->members, m, m);
     else
-	dict_put(&cls->static_members, m, m);
+    dict_put(&cls->static_members, m, m);
     return m;
 }
 methodinfo_t* methodinfo_register_global(U8 access, const char*package, const char*name)
@@ -253,7 +253,7 @@ methodinfo_t* methodinfo_register_global(U8 access, const char*package, const ch
     m->name = name;
     m->parent = 0;
     dict_put(registry_classes, m, m);
-    
+
     schedule_for_resolve((slotinfo_t*)m);
     return m;
 }
@@ -267,7 +267,7 @@ varinfo_t* varinfo_register_global(U8 access, const char*package, const char*nam
     m->name = name;
     m->parent = 0;
     dict_put(registry_classes, m, m);
-    
+
     schedule_for_resolve((slotinfo_t*)m);
     return m;
 }
@@ -318,15 +318,15 @@ memberinfo_t* registry_findmember(classinfo_t*cls, const char*ns, const char*nam
     tmp.name = name;
     tmp.package = ns?ns:"";
 
-    if(!recursive) {
-	if(!is_static) 
-	    return (memberinfo_t*)dict_lookup(&cls->members, &tmp);
+	if(!recursive) {
+	if(!is_static)
+		return (memberinfo_t*)dict_lookup(&cls->members, &tmp);
 	else
-	    return (memberinfo_t*)dict_lookup(&cls->static_members, &tmp);
-    }
-    /* look at classes directly extended by this class */
-    slotinfo_t*m = 0;
-    classinfo_t*s = cls;
+		return (memberinfo_t*)dict_lookup(&cls->static_members, &tmp);
+	}
+	/* look at classes directly extended by this class */
+	slotinfo_t*m = 0;
+	classinfo_t*s = cls;
 
     if(recursive>1) // check *only* superclasses
         s = s->superclass;
@@ -336,8 +336,8 @@ memberinfo_t* registry_findmember(classinfo_t*cls, const char*ns, const char*nam
             break;
 
 	if(!is_static) {
-	    m = (slotinfo_t*)dict_lookup(&s->members, &tmp);
-	    if(m) return (memberinfo_t*)m;
+		m = (slotinfo_t*)dict_lookup(&s->members, &tmp);
+		if(m) return (memberinfo_t*)m;
 	}
 	m = (slotinfo_t*)dict_lookup(&s->static_members, &tmp);
 	if(m) return (memberinfo_t*)m;
@@ -350,12 +350,12 @@ memberinfo_t* registry_findmember(classinfo_t*cls, const char*ns, const char*nam
         classinfo_t*s = cls->interfaces[t];
         if(s->kind != INFOTYPE_UNRESOLVED) {
             while(s) {
-		if(!is_static) {
-		    m = (slotinfo_t*)dict_lookup(&s->members, &tmp);
-		    if(m) return (memberinfo_t*)m;
-		}
-		m = (slotinfo_t*)dict_lookup(&s->static_members, &tmp);
-		if(m) return (memberinfo_t*)m;
+        if(!is_static) {
+            m = (slotinfo_t*)dict_lookup(&s->members, &tmp);
+            if(m) return (memberinfo_t*)m;
+        }
+        m = (slotinfo_t*)dict_lookup(&s->static_members, &tmp);
+        if(m) return (memberinfo_t*)m;
 
                 s = s->superclass;
             }
@@ -430,7 +430,7 @@ classinfo_t* slotinfo_asclass(slotinfo_t*f) {
     } else {
         c->name = "undefined";
     }
-    
+
     dict_init2(&c->members, &memberinfo_type, 1);
     dict_init2(&c->static_members, &memberinfo_type, 1);
     c->data = f;
@@ -446,7 +446,7 @@ classinfo_t* slotinfo_gettype(slotinfo_t*f)
        } else if(f->kind == INFOTYPE_VAR) {
            varinfo_t*v = (varinfo_t*)f;
            return v->type;
-       } else 
+       } else
            return 0;
     } else {
        return TYPE_ANY;
@@ -462,11 +462,11 @@ char registry_ispackage(const char*package)
 // ----------------------- builtin types ------------------------------
 
 char registry_isfunctionclass(classinfo_t*c) {
-    return (c && c->package && c->name && 
+    return (c && c->package && c->name &&
             !strcmp(c->package, "") && !strcmp(c->name, "Function"));
 }
 char registry_isclassclass(classinfo_t*c) {
-    return (c && c->package && c->name && 
+    return (c && c->package && c->name &&
             !strcmp(c->package, "") && !strcmp(c->name, "Class"));
 }
 
@@ -560,12 +560,12 @@ namespace_t access2namespace(U8 access, char*package)
 
 char* infotypename(slotinfo_t*s)
 {
-    if(!s) 
+	if(!s)
 	return "(unknown)";
-    if(s->kind == INFOTYPE_CLASS) return "class";
-    else if(s->kind == INFOTYPE_VAR) return "var";
-    else if(s->kind == INFOTYPE_METHOD) return "function";
-    else return "object";
+	if(s->kind == INFOTYPE_CLASS) return "class";
+	else if(s->kind == INFOTYPE_VAR) return "var";
+	else if(s->kind == INFOTYPE_METHOD) return "function";
+	else return "object";
 }
 
 void slotinfo_dump(slotinfo_t*s)

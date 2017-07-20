@@ -53,21 +53,21 @@ static void linedraw_moveTo(gfxdrawer_t*d, gfxcoord_t x, gfxcoord_t y)
     d->y = l->y = y;
     l->next = 0;
     if(i->next)
-	i->next->next = l;
+    i->next->next = l;
     i->next = l;
     if(!i->start)
-	i->start = l;
+    i->start = l;
 }
 static void linedraw_lineTo(gfxdrawer_t*d, gfxcoord_t x, gfxcoord_t y)
 {
     linedraw_internal_t*i = (linedraw_internal_t*)d->internal;
     if(!i->has_moveto) {
-	/* starts with a line, not with a moveto. As this is the first
-	   entry in the list, this is probably *meant* to be a moveto */
-	linedraw_moveTo(d, x, y);
-	return;
+    /* starts with a line, not with a moveto. As this is the first
+       entry in the list, this is probably *meant* to be a moveto */
+    linedraw_moveTo(d, x, y);
+    return;
     }
-    
+
     gfxline_t*l = (gfxline_t*)rfx_alloc(sizeof(gfxline_t));
     l->type = gfx_lineTo;
     d->x = l->x = x;
@@ -75,17 +75,17 @@ static void linedraw_lineTo(gfxdrawer_t*d, gfxcoord_t x, gfxcoord_t y)
 
     l->next = 0;
     if(i->next)
-	i->next->next = l;
+    i->next->next = l;
     i->next = l;
     if(!i->start)
-	i->start = l;
+    i->start = l;
 }
 static void linedraw_splineTo(gfxdrawer_t*d, gfxcoord_t sx, gfxcoord_t sy, gfxcoord_t x, gfxcoord_t y)
 {
     linedraw_internal_t*i = (linedraw_internal_t*)d->internal;
     if(!i->has_moveto) {
-	linedraw_moveTo(d, x, y);
-	return;
+    linedraw_moveTo(d, x, y);
+    return;
     }
 
     gfxline_t*l = (gfxline_t*)rfx_alloc(sizeof(gfxline_t));
@@ -96,16 +96,16 @@ static void linedraw_splineTo(gfxdrawer_t*d, gfxcoord_t sx, gfxcoord_t sy, gfxco
     l->sy = sy;
     l->next = 0;
     if(i->next)
-	i->next->next = l;
+    i->next->next = l;
     i->next = l;
     if(!i->start)
-	i->start = l;
+    i->start = l;
 }
 static void linedraw_close(gfxdrawer_t*d)
 {
     linedraw_internal_t*i = (linedraw_internal_t*)d->internal;
-    if(!i->has_moveto) 
-	return;
+    if(!i->has_moveto)
+    return;
     linedraw_lineTo(d, i->x0, i->y0);
     i->has_moveto = 0;
     i->x0 = 0;
@@ -189,15 +189,15 @@ static double get_spline_len(qspline_abc_t*s)
     r2 = 1.0/(parts*parts);
     for(i=0;i<parts;i++)
     {
-	double dx = s->ax*(2*i+1)*r2 + s->bx*r;
-	double dy = s->ay*(2*i+1)*r2 + s->by*r;
-	len += sqrt(dx*dx+dy*dy);
+    double dx = s->ax*(2*i+1)*r2 + s->bx*r;
+    double dy = s->ay*(2*i+1)*r2 + s->by*r;
+    len += sqrt(dx*dx+dy*dy);
     }
     /*printf("Spline from %f,%f to %f,%f has len %f (%f)\n", s->cx, s->cy,
-	    s->cx + s->bx + s->ax,
-	    s->cy + s->by + s->ay, len,
-	    sqrt((s->bx + s->ax)*(s->bx + s->ax) + (s->by + s->ay)*(s->by + s->ay))
-	    );
+        s->cx + s->bx + s->ax,
+        s->cy + s->by + s->ay, len,
+        sqrt((s->bx + s->ax)*(s->bx + s->ax) + (s->by + s->ay)*(s->by + s->ay))
+        );
     assert(len+0.5 >= sqrt((s->bx + s->ax)*(s->bx + s->ax) + (s->by + s->ay)*(s->by + s->ay)));
      */
     return len;
@@ -210,11 +210,11 @@ void gfxtool_draw_dashed_line(gfxdrawer_t*d, gfxline_t*line, float*r, float phas
     char on = 0;
     int apos=0;
 
-    if(line && line->type != gfx_moveTo) {
+	if(line && line->type != gfx_moveTo) {
 	fprintf(stderr, "gfxtool: outline doesn't start with a moveTo");
 	return;
-    }
-    
+	}
+
     int i;
     double dashlen=0;
     for(i=0;r[i]>=0;i++) {
@@ -224,117 +224,117 @@ void gfxtool_draw_dashed_line(gfxdrawer_t*d, gfxline_t*line, float*r, float phas
         // no dashing. just draw the thing
         while(line) {
             if(line->type == gfx_moveTo) {
-		d->moveTo(d, line->x, line->y);
+        d->moveTo(d, line->x, line->y);
             } else if(line->type == gfx_lineTo) {
-		d->lineTo(d, line->x, line->y);
+        d->lineTo(d, line->x, line->y);
             } else if(line->type == gfx_splineTo) {
-		d->splineTo(d, line->sx, line->sy, line->x, line->y);
+        d->splineTo(d, line->sx, line->sy, line->x, line->y);
             }
             line = line->next;
         }
         return;
     }
 
-    if(phase < 0) {
+	if(phase < 0) {
 	phase = -phase;
-    }
+	}
 
-    if(r[0]<0 || phase<0) {
+	if(r[0]<0 || phase<0) {
 	fprintf(stderr, "gfxtool: invalid (negative) dashes: %f, phase=%f\n", r[0], phase);
 	return;
-    }
+	}
 
-    for(;line;line=line->next) {
+	for(;line;line=line->next) {
 	if(line->type == gfx_moveTo) {
-	    d->moveTo(d, line->x, line->y);
-	    on = 1; nextpos = r[0]; apos = 0; linepos = 0;
-	    x = line->x; y = line->y;
-	    while(linepos < phase) {
+		d->moveTo(d, line->x, line->y);
+		on = 1; nextpos = r[0]; apos = 0; linepos = 0;
+		x = line->x; y = line->y;
+		while(linepos < phase) {
 		//printf("[+] linepos: %f, phase: %f, on:%d, apos:%d nextpos:%f\n", linepos, phase, on, apos, nextpos);
 		linepos += r[apos];
 		if(linepos < phase) {
-		    on ^= 1;
-		    if(r[++apos]<0)
+			on ^= 1;
+			if(r[++apos]<0)
 			apos = 0;
-		    nextpos += r[apos];
+			nextpos += r[apos];
 		}
-	    }
-	    linepos = phase;
-	    //printf("[k] linepos: %f, phase: %f, on:%d, apos:%d nextpos:%f \n", linepos, phase, on, apos, nextpos);
+		}
+		linepos = phase;
+		//printf("[k] linepos: %f, phase: %f, on:%d, apos:%d nextpos:%f \n", linepos, phase, on, apos, nextpos);
 	} else if(line->type == gfx_lineTo) {
-	    double dx = line->x - x;
-	    double dy = line->y - y;
-	    double len = sqrt(dx*dx+dy*dy);
-	    double vx;
-	    double vy;
-	    double lineend = linepos+len;
-	    if(len==0)
+		double dx = line->x - x;
+		double dy = line->y - y;
+		double len = sqrt(dx*dx+dy*dy);
+		double vx;
+		double vy;
+		double lineend = linepos+len;
+		if(len==0)
 		continue;
-	    vx = dx/len;
-	    vy = dy/len;
-	    assert(nextpos>=linepos);
-	    //printf("(line) on:%d apos: %d nextpos: %f, line pos: %f, line end: %f\n", on, apos, nextpos, linepos, linepos+len);
-	    while(nextpos<lineend) {
+		vx = dx/len;
+		vy = dy/len;
+		assert(nextpos>=linepos);
+		//printf("(line) on:%d apos: %d nextpos: %f, line pos: %f, line end: %f\n", on, apos, nextpos, linepos, linepos+len);
+		while(nextpos<lineend) {
 		double nx = x + vx*(nextpos-linepos);
 		double ny = y + vy*(nextpos-linepos);
 		if(on) {d->lineTo(d, nx,ny);/*printf("lineTo %f\n", nextpos);*/}
 		else   {d->moveTo(d, nx,ny);/*printf("moveTo %f\n", nextpos);*/}
 		on^=1;
 		if(r[++apos]<0)
-		    apos = 0;
+			apos = 0;
 		nextpos+=r[apos];
-	    }
-	    linepos = lineend;
-	    if(on) {
+		}
+		linepos = lineend;
+		if(on) {
 		//printf("lineTo %f\n", 1.0);
 		d->lineTo(d, line->x,line->y);
-	    }
-	    x = line->x; y = line->y;
+		}
+		x = line->x; y = line->y;
 	} else if(line->type == gfx_splineTo) {
-	    qspline_abc_t q;
-	    double len, lineend,lastt;
-	    mkspline(&q, x, y, line);
+		qspline_abc_t q;
+		double len, lineend,lastt;
+		mkspline(&q, x, y, line);
 
-	    len = get_spline_len(&q);
-	    //printf("%f %f -> %f %f, len: %f\n", x, y, line->x, line->y, len);
-	    if(len==0)
+		len = get_spline_len(&q);
+		//printf("%f %f -> %f %f, len: %f\n", x, y, line->x, line->y, len);
+		if(len==0)
 		continue;
-	    lineend = linepos+len;
-	    lastt = 0;
-	    if(nextpos<linepos)
+		lineend = linepos+len;
+		lastt = 0;
+		if(nextpos<linepos)
 		printf("%f !< %f\n", nextpos, linepos);
-	    assert(nextpos>=linepos);
-	    //printf("(spline) on:%d apos: %d nextpos: %f, line pos: %f, line end: %f\n", on, apos, nextpos, linepos, linepos+len);
-	    while(nextpos<lineend) {
+		assert(nextpos>=linepos);
+		//printf("(spline) on:%d apos: %d nextpos: %f, line pos: %f, line end: %f\n", on, apos, nextpos, linepos, linepos+len);
+		while(nextpos<lineend) {
 		double t = (nextpos-linepos)/len;
 		//printf("%f (%f-%f) apos=%d r[apos]=%f\n", t, nextpos, linepos, apos, r[apos]);
 		double nx = q.ax*t*t+q.bx*t+q.cx;
 		double ny = q.ay*t*t+q.by*t+q.cy;
 		if(on) {
-		    double sx,sy;
-		    spline_get_controlpoint(&q, lastt, t, &sx, &sy);
-		    d->splineTo(d, sx, sy, nx,ny);
-		    //printf("splineTo %f\n", nextpos);
+			double sx,sy;
+			spline_get_controlpoint(&q, lastt, t, &sx, &sy);
+			d->splineTo(d, sx, sy, nx,ny);
+			//printf("splineTo %f\n", nextpos);
 		} else  {
-		    d->moveTo(d, nx,ny);
-		    //printf("moveTo %f\n", nextpos);
+			d->moveTo(d, nx,ny);
+			//printf("moveTo %f\n", nextpos);
 		}
 		lastt =  t;
 		on^=1;
 		if(r[++apos]<0)
-		    apos = 0;
+			apos = 0;
 		nextpos+=r[apos];
-	    }
-	    linepos = lineend;
-	    if(on) {
+		}
+		linepos = lineend;
+		if(on) {
 		double sx,sy;
 		spline_get_controlpoint(&q, lastt, 1, &sx, &sy);
 		d->splineTo(d, sx, sy, line->x,line->y);
 		//printf("splineTo %f\n", 1.0);
-	    }
-	    x = line->x; y = line->y;
+		}
+		x = line->x; y = line->y;
 	}
-    }
+	}
 }
 
 static char* getToken(const char**p)
@@ -342,13 +342,13 @@ static char* getToken(const char**p)
     const char*start;
     char*result;
     while(**p && strchr(" ,()\t\n\r", **p)) {
-	(*p)++;
-    } 
+    (*p)++;
+    }
     start = *p;
     if (strchr("LMlm", **p) && (isdigit(*(*p+1))||strchr("+-", *(*p+1)))) {
-	(*p)++;
+    (*p)++;
     } else while(**p && !strchr(" ,()\t\n\r", **p)) {
-	(*p)++;
+    (*p)++;
     }
     result = (char*)malloc((*p)-start+1);
     memcpy(result,start,(*p)-start+1);
@@ -371,34 +371,34 @@ gfxline_t*gfxline_fromstring(const char*string)
 
     const char*p = string;
     while(*p) {
-	char*token = getToken(&p);
-	if(!token)
-	    break;
-	if (!*token) {
-	    free(token);
-	    break;
-	}
-	if(!strcmp(token, "M")) {
-	    double x = getFloat(&p);
-	    double y = getFloat(&p);
-	    d.moveTo(&d, x, y);
-	} else if(!strncmp(token, "L", 1)) {
-	    double x = getFloat(&p);
-	    double y = getFloat(&p);
-	    d.lineTo(&d, x, y);
-	} else if(!strncmp(token, "C", 1)) {
-	    double x1 = getFloat(&p);
-	    double y1 = getFloat(&p);
-	    double x2 = getFloat(&p);
-	    double y2 = getFloat(&p);
-	    double x3 = getFloat(&p);
-	    double y3 = getFloat(&p);
-	    gfxdraw_cubicTo(&d, x1,y1, x2,y2, x3,y3, 0.9);
-	} else if(!strncmp(token, "z", 1)) {
-	    //ignore
-	} else    
-	    fprintf(stderr, "gfxdraw: Warning: unknown primitive '%s'\n", token);
-	free(token);
+    char*token = getToken(&p);
+    if(!token)
+        break;
+    if (!*token) {
+        free(token);
+        break;
+    }
+    if(!strcmp(token, "M")) {
+        double x = getFloat(&p);
+        double y = getFloat(&p);
+        d.moveTo(&d, x, y);
+    } else if(!strncmp(token, "L", 1)) {
+        double x = getFloat(&p);
+        double y = getFloat(&p);
+        d.lineTo(&d, x, y);
+    } else if(!strncmp(token, "C", 1)) {
+        double x1 = getFloat(&p);
+        double y1 = getFloat(&p);
+        double x2 = getFloat(&p);
+        double y2 = getFloat(&p);
+        double x3 = getFloat(&p);
+        double y3 = getFloat(&p);
+        gfxdraw_cubicTo(&d, x1,y1, x2,y2, x3,y3, 0.9);
+    } else if(!strncmp(token, "z", 1)) {
+        //ignore
+    } else
+        fprintf(stderr, "gfxdraw: Warning: unknown primitive '%s'\n", token);
+    free(token);
     }
     gfxline_t*line = d.result(&d);
     return line;
@@ -410,16 +410,16 @@ gfxline_t * gfxline_clone(gfxline_t*line)
     gfxline_t*dest = 0;
     gfxline_t*pos = 0;
     while(line) {
-	gfxline_t*n = (gfxline_t*)rfx_calloc(sizeof(gfxline_t));
-	*n = *line;
-	n->next = 0;
-	if(!pos) {
-	    dest = pos = n;
-	} else {
-	    pos->next = n;
-	    pos = n;
-	}
-	line = line->next;
+    gfxline_t*n = (gfxline_t*)rfx_calloc(sizeof(gfxline_t));
+    *n = *line;
+    n->next = 0;
+    if(!pos) {
+        dest = pos = n;
+    } else {
+        pos->next = n;
+        pos = n;
+    }
+    line = line->next;
     }
     return dest;
 }
@@ -446,43 +446,43 @@ void gfxline_optimize(gfxline_t*line)
     /* step 1: convert splines to lines, where possible */
     double x=0,y=0;
     while(l) {
-	if(l->type == gfx_splineTo && splineIsStraight(x,y,l)) {
-	    l->type = gfx_lineTo;
-	}
-	x = l->x;
-	y = l->y;
-	l = l->next;
+    if(l->type == gfx_splineTo && splineIsStraight(x,y,l)) {
+        l->type = gfx_lineTo;
+    }
+    x = l->x;
+    y = l->y;
+    l = l->next;
     }
     /* step 2: combine adjacent lines and splines, where possible */
     l = line;
     while(l && l->next) {
-	gfxline_t*next = l->next;
-	char combine = 0;
-	double sx=0,sy=0;
-	if(l->type == gfx_lineTo && next->type == gfx_lineTo) {
-	    double dx = l->x-x;
-	    double dy = l->y-y;
-	    double nx = next->x-l->x;
-	    double ny = next->y-l->y;
-	    if(fabs(dx*ny - dy*nx) < 0.000001 && (dx*nx + dy*ny) >= 0) {
-		combine = 1;
-	    }
-	} else if(l->type == gfx_splineTo && next->type == gfx_splineTo) {
-	    /* TODO */
-	}
-	if(combine) {
-	    l->next = next->next;
-	    next->next = 0;
-	    l->x = next->x;
-	    l->y = next->y;
-	    l->sx = sx;
-	    l->sy = sy;
-	    rfx_free(next);
-	} else {
-	    x = l->x;
-	    y = l->y;
-	    l = l->next;
-	}
+    gfxline_t*next = l->next;
+    char combine = 0;
+    double sx=0,sy=0;
+    if(l->type == gfx_lineTo && next->type == gfx_lineTo) {
+        double dx = l->x-x;
+        double dy = l->y-y;
+        double nx = next->x-l->x;
+        double ny = next->y-l->y;
+        if(fabs(dx*ny - dy*nx) < 0.000001 && (dx*nx + dy*ny) >= 0) {
+        combine = 1;
+        }
+    } else if(l->type == gfx_splineTo && next->type == gfx_splineTo) {
+        /* TODO */
+    }
+    if(combine) {
+        l->next = next->next;
+        next->next = 0;
+        l->x = next->x;
+        l->y = next->y;
+        l->sx = sx;
+        l->sy = sy;
+        rfx_free(next);
+    } else {
+        x = l->x;
+        y = l->y;
+        l = l->next;
+    }
     }
 }
 
@@ -498,34 +498,34 @@ gfxline_t* gfxtool_dash_line(gfxline_t*line, float*dashes, float phase)
 
 void gfxline_show(gfxline_t*l, FILE*fi)
 {
-    while(l) {
+	while(l) {
 	if(l->type == gfx_moveTo) {
-	    fprintf(fi, "moveTo %.2f,%.2f\n", l->x, l->y);
+		fprintf(fi, "moveTo %.2f,%.2f\n", l->x, l->y);
 	}
 	if(l->type == gfx_lineTo) {
-	    fprintf(fi, "lineTo %.2f,%.2f\n", l->x, l->y);
+		fprintf(fi, "lineTo %.2f,%.2f\n", l->x, l->y);
 	}
 	if(l->type == gfx_splineTo) {
-	    fprintf(fi, "splineTo %.2f,%.2f %.2f,%.2f\n", l->sx, l->sy, l->x, l->y);
+		fprintf(fi, "splineTo %.2f,%.2f %.2f,%.2f\n", l->sx, l->sy, l->x, l->y);
 	}
 	l = l->next;
-    }
+	}
 }
 
 void gfxline_free(gfxline_t*l)
 {
-    if(l && (l+1) == l->next) {
+	if(l && (l+1) == l->next) {
 	/* flattened */
 	rfx_free(l);
-    } else {
+	} else {
 	gfxline_t*next;
 	while(l) {
-	    next = l->next;
-	    l->next = 0;
-	    rfx_free(l);
-	    l = next;
+		next = l->next;
+		l->next = 0;
+		rfx_free(l);
+		l = next;
 	}
-    }
+	}
 }
 
 static inline gfxpoint_t cspline_getpoint(const struct cspline_t*s, double t)
@@ -537,9 +537,9 @@ static inline gfxpoint_t cspline_getpoint(const struct cspline_t*s, double t)
     double mtmt = mt*(1-t);
     double mtmtmt = mtmt*(1-t);
     p.x= s->end.x*ttt + 3*s->control2.x*tt*mt
-	    + 3*s->control1.x*t*mtmt + s->start.x*mtmtmt;
+        + 3*s->control1.x*t*mtmt + s->start.x*mtmtmt;
     p.y= s->end.y*ttt + 3*s->control2.y*tt*mt
-	    + 3*s->control1.y*t*mtmt + s->start.y*mtmtmt;
+        + 3*s->control1.y*t*mtmt + s->start.y*mtmtmt;
     return p;
 }
 static gfxpoint_t qspline_getpoint(const qspline_t*s, double t)
@@ -560,15 +560,15 @@ static int approximate3(const cspline_t*s, qspline_t*q, int size, double quality
 
     while(istart<0x80000000)
     {
-	unsigned int iend = istart + istep;
-	double start = istart/(double)0x80000000;
-	double end = iend/(double)0x80000000;
-	qspline_t test;
-	double pos,qpos;
-	char left = 0,recurse=0;
-	int t;
-	int probes = 15;
-	double dx,dy;
+    unsigned int iend = istart + istep;
+    double start = istart/(double)0x80000000;
+    double end = iend/(double)0x80000000;
+    qspline_t test;
+    double pos,qpos;
+    char left = 0,recurse=0;
+    int t;
+    int probes = 15;
+    double dx,dy;
 
 	/* create simple approximation: a qspline_t which run's through the
 	   qspline_t point at 0.5 */
@@ -583,54 +583,54 @@ static int approximate3(const cspline_t*s, qspline_t*q, int size, double quality
 	/* depending on where we are in the spline, we either try to match
 	   the left or right tangent */
 	if(start<0.5)
-	    left=1;
+		left=1;
 	/* get derivative */
 	pos = left?start:end;
 	qpos = pos*pos;
 	test.control.x = s->end.x*(3*qpos) + 3*s->control2.x*(2*pos-3*qpos) +
-		    3*s->control1.x*(1-4*pos+3*qpos) + s->start.x*(-3+6*pos-3*qpos);
+			3*s->control1.x*(1-4*pos+3*qpos) + s->start.x*(-3+6*pos-3*qpos);
 	test.control.y = s->end.y*(3*qpos) + 3*s->control2.y*(2*pos-3*qpos) +
-		    3*s->control1.y*(1-4*pos+3*qpos) + s->start.y*(-3+6*pos-3*qpos);
+			3*s->control1.y*(1-4*pos+3*qpos) + s->start.y*(-3+6*pos-3*qpos);
 	if(left) {
-	    test.control.x *= (end-start)/2;
-	    test.control.y *= (end-start)/2;
-	    test.control.x += test.start.x;
-	    test.control.y += test.start.y;
+		test.control.x *= (end-start)/2;
+		test.control.y *= (end-start)/2;
+		test.control.x += test.start.x;
+		test.control.y += test.start.y;
 	} else {
-	    test.control.x *= -(end-start)/2;
-	    test.control.y *= -(end-start)/2;
-	    test.control.x += test.end.x;
-	    test.control.y += test.end.y;
+		test.control.x *= -(end-start)/2;
+		test.control.y *= -(end-start)/2;
+		test.control.x += test.end.x;
+		test.control.y += test.end.y;
 	}
 
 //#define PROBES
 #ifdef PROBES
 	/* measure the spline's accurancy, by taking a number of probes */
 	for(t=0;t<probes;t++) {
-	    gfxpoint_t qr1,qr2,cr1,cr2;
-	    double pos = 0.5/(probes*2)*(t*2+1);
-	    double dx,dy;
-	    double dist1,dist2;
-	    qr1 = qspline_getpoint(&test, pos);
-	    cr1 = cspline_getpoint(s, start+pos*(end-start));
+		gfxpoint_t qr1,qr2,cr1,cr2;
+		double pos = 0.5/(probes*2)*(t*2+1);
+		double dx,dy;
+		double dist1,dist2;
+		qr1 = qspline_getpoint(&test, pos);
+		cr1 = cspline_getpoint(s, start+pos*(end-start));
 
-	    dx = qr1.x - cr1.x;
-	    dy = qr1.y - cr1.y;
-	    dist1 = dx*dx+dy*dy;
+		dx = qr1.x - cr1.x;
+		dy = qr1.y - cr1.y;
+		dist1 = dx*dx+dy*dy;
 
-	    if(dist1>quality2) {
+		if(dist1>quality2) {
 		recurse=1;break;
-	    }
-	    qr2 = qspline_getpoint(&test, (1-pos));
-	    cr2 = cspline_getpoint(s, start+(1-pos)*(end-start));
+		}
+		qr2 = qspline_getpoint(&test, (1-pos));
+		cr2 = cspline_getpoint(s, start+(1-pos)*(end-start));
 
-	    dx = qr2.x - cr2.x;
-	    dy = qr2.y - cr2.y;
-	    dist2 = dx*dx+dy*dy;
+		dx = qr2.x - cr2.x;
+		dy = qr2.y - cr2.y;
+		dist2 = dx*dx+dy*dy;
 
-	    if(dist2>quality2) {
+		if(dist2>quality2) {
 		recurse=1;break;
-	    }
+		}
 	}
 #else // quadratic error: *much* faster!
 
@@ -655,19 +655,19 @@ static int approximate3(const cspline_t*s, qspline_t*q, int size, double quality
 #endif
 
 	if(recurse && istep>1 && size-level > num) {
-	    istep >>= 1;
-	    level++;
+		istep >>= 1;
+		level++;
 	} else {
-	    *q++ = test;
-	    num++;
-	    istart += istep;
-	    while(!(istart & istep)) {
+		*q++ = test;
+		num++;
+		istart += istep;
+		while(!(istart & istep)) {
 		level--;
 		istep <<= 1;
-	    }
+		}
 	}
-    }
-    return num;
+	}
+	return num;
 }
 
 void gfxdraw_conicTo(gfxdrawer_t*draw, double cx, double cy, double tox, double toy, double quality)
@@ -698,7 +698,7 @@ void gfxdraw_cubicTo(gfxdrawer_t*draw, double c1x, double c1y, double c2x, doubl
 
     num = approximate3(&c, q, 128, maxerror);
 
-    for(t=0;t<num;t++) {
+	for(t=0;t<num;t++) {
 	gfxpoint_t mid;
 	gfxpoint_t to;
 	mid.x = q[t].control.x;
@@ -706,28 +706,28 @@ void gfxdraw_cubicTo(gfxdrawer_t*draw, double c1x, double c1y, double c2x, doubl
 	to.x = q[t].end.x;
 	to.y = q[t].end.y;
 	draw->splineTo(draw, mid.x, mid.y, to.x, to.y);
-    }
+	}
 }
 
 gfxbbox_t gfxbbox_expand_to_point(gfxbbox_t box, gfxcoord_t x, gfxcoord_t y)
 {
-    if(box.xmin==0 && box.ymin==0 && box.xmax==0 && box.ymax==0) {
+	if(box.xmin==0 && box.ymin==0 && box.xmax==0 && box.ymax==0) {
 	box.xmin = x;
 	box.ymin = y;
 	box.xmax = x;
 	box.ymax = y;
 	if(x==0 && y==0) box.xmax = 0.0000001;
 	return box;
-    }
-    if(x < box.xmin)
+	}
+	if(x < box.xmin)
 	box.xmin = x;
-    if(x > box.xmax)
+	if(x > box.xmax)
 	box.xmax = x;
-    if(y < box.ymin)
+	if(y < box.ymin)
 	box.ymin = y;
-    if(y > box.ymax)
+	if(y > box.ymax)
 	box.ymax = y;
-    return box;
+	return box;
 }
 
 gfxbbox_t gfxbbox_expand_to_bbox(gfxbbox_t box, gfxbbox_t box2)
@@ -742,17 +742,17 @@ gfxbbox_t gfxbbox_expand_to_bbox(gfxbbox_t box, gfxbbox_t box2)
 
 void gfxbbox_intersect(gfxbbox_t*box1, gfxbbox_t*box2)
 {
-    if(box2->xmin > box1->xmin)
+	if(box2->xmin > box1->xmin)
 	box1->xmin = box2->xmin;
-    if(box2->ymin > box1->ymin)
+	if(box2->ymin > box1->ymin)
 	box1->ymin = box2->ymin;
-    if(box2->xmax < box1->xmax)
+	if(box2->xmax < box1->xmax)
 	box1->xmax = box2->xmax;
-    if(box2->ymax < box1->ymax)
+	if(box2->ymax < box1->ymax)
 	box1->ymax = box2->ymax;
-    if(box1->xmin > box1->xmax)
+	if(box1->xmin > box1->xmax)
 	box1->xmax = box1->xmin;
-    if(box1->ymin > box1->ymax)
+	if(box1->ymin > box1->ymax)
 	box1->ymax = box1->ymin;
 }
 
@@ -762,21 +762,21 @@ gfxbbox_t gfxline_getbbox(gfxline_t*line)
     gfxbbox_t bbox = {0,0,0,0};
     char last = 0;
     while(line) {
-	if(line->type == gfx_moveTo) {
-	    last = 1;
-	} else if(line->type == gfx_lineTo) {
-	    if(last) bbox = gfxbbox_expand_to_point(bbox, x, y);
-	    bbox = gfxbbox_expand_to_point(bbox, line->x, line->y);
-	    last = 0;
-	} else if(line->type == gfx_splineTo) {
-	    if(last) bbox = gfxbbox_expand_to_point(bbox, x, y);
-	    bbox = gfxbbox_expand_to_point(bbox, line->sx, line->sy);
-	    bbox = gfxbbox_expand_to_point(bbox, line->x, line->y);
-	    last = 0;
-	}
-	x = line->x;
-	y = line->y;
-	line = line->next;
+    if(line->type == gfx_moveTo) {
+        last = 1;
+    } else if(line->type == gfx_lineTo) {
+        if(last) bbox = gfxbbox_expand_to_point(bbox, x, y);
+        bbox = gfxbbox_expand_to_point(bbox, line->x, line->y);
+        last = 0;
+    } else if(line->type == gfx_splineTo) {
+        if(last) bbox = gfxbbox_expand_to_point(bbox, x, y);
+        bbox = gfxbbox_expand_to_point(bbox, line->sx, line->sy);
+        bbox = gfxbbox_expand_to_point(bbox, line->x, line->y);
+        last = 0;
+    }
+    x = line->x;
+    y = line->y;
+    line = line->next;
     }
     return bbox;
 }
@@ -785,9 +785,9 @@ gfxline_t* gfxline_append(gfxline_t*line1, gfxline_t*line2)
 {
     gfxline_t*l = line1;;
     if(!l)
-	return line2;
+    return line2;
     while(l->next) {
-	l = l->next;
+    l = l->next;
     }
     l->next = line2;
     return line1;
@@ -795,19 +795,19 @@ gfxline_t* gfxline_append(gfxline_t*line1, gfxline_t*line2)
 
 void gfxline_transform(gfxline_t*line, gfxmatrix_t*matrix)
 {
-    while(line) {
+	while(line) {
 	double x = matrix->m00*line->x + matrix->m10*line->y + matrix->tx;
 	double y = matrix->m01*line->x + matrix->m11*line->y + matrix->ty;
 	line->x = x;
 	line->y = y;
 	if(line->type == gfx_splineTo) {
-	    double sx = matrix->m00*line->sx + matrix->m10*line->sy + matrix->tx;
-	    double sy = matrix->m01*line->sx + matrix->m11*line->sy + matrix->ty;
-	    line->sx = sx;
-	    line->sy = sy;
+		double sx = matrix->m00*line->sx + matrix->m10*line->sy + matrix->tx;
+		double sy = matrix->m01*line->sx + matrix->m11*line->sy + matrix->ty;
+		line->sx = sx;
+		line->sy = sy;
 	}
 	line = line->next;
-    }
+	}
 }
 
 void gfxmatrix_dump(gfxmatrix_t*m, FILE*fi, char*prefix)
@@ -825,8 +825,8 @@ void gfxmatrix_invert(gfxmatrix_t*m, gfxmatrix_t*dest)
 {
     double det = m->m00 * m->m11 - m->m10 * m->m01;
     if(!det) {
-	memset(dest, 0, sizeof(gfxmatrix_t));
-	return;
+    memset(dest, 0, sizeof(gfxmatrix_t));
+    return;
     }
     det = 1/det;
     dest->m00 = m->m11 * det;
@@ -862,10 +862,10 @@ gfxfont_t*gfxfontlist_findfont(gfxfontlist_t*list, char*id)
 {
     gfxfontlist_t*l = list;
     while(l) {
-	if(!strcmp((char*)l->font->id, id)) {
-	    return l->font;
-	}
-	l = l->next;
+    if(!strcmp((char*)l->font->id, id)) {
+        return l->font;
+    }
+    l = l->next;
     }
     return 0;
 }
@@ -873,10 +873,10 @@ char gfxfontlist_hasfont(gfxfontlist_t*list, gfxfont_t*font)
 {
     gfxfontlist_t*l = list;
     while(l) {
-	if(!strcmp((char*)l->font->id, font->id)) {
-	    return 1;
-	}
-	l = l->next;
+    if(!strcmp((char*)l->font->id, font->id)) {
+        return 1;
+    }
+    l = l->next;
     }
     return 0;
 }
@@ -884,10 +884,10 @@ void*gfxfontlist_getuserdata(gfxfontlist_t*list, const char*id)
 {
     gfxfontlist_t*l = list;
     while(l) {
-	if(!strcmp((char*)l->font->id, id)) {
-	    return l->user;
-	}
-	l = l->next;
+    if(!strcmp((char*)l->font->id, id)) {
+        return l->user;
+    }
+    l = l->next;
     }
     return 0;
 }
@@ -895,24 +895,24 @@ gfxfontlist_t*gfxfontlist_addfont2(gfxfontlist_t*list, gfxfont_t*font, void*user
 {
     gfxfontlist_t*last=0,*l = list;
     while(l) {
-	last = l;
-	if(l->font == font) {
-	    return list; // we already know this font
-	}
-	l = l->next;
+    last = l;
+    if(l->font == font) {
+        return list; // we already know this font
+    }
+    l = l->next;
     }
     if(!font) {
-	fprintf(stderr, "Tried to add zero font\n");
+    fprintf(stderr, "Tried to add zero font\n");
     }
     l = (gfxfontlist_t*)rfx_calloc(sizeof(gfxfontlist_t));
     l->font = font;
     l->user = user;
     l->next = 0;
     if(last) {
-	last->next = l;
-	return list;
+    last->next = l;
+    return list;
     } else {
-	return l;
+    return l;
     }
 }
 gfxfontlist_t*gfxfontlist_addfont(gfxfontlist_t*list, gfxfont_t*font)
@@ -923,13 +923,13 @@ void gfxfontlist_free(gfxfontlist_t*list, char deletefonts)
 {
     gfxfontlist_t*l = list;
     while(l) {
-	gfxfontlist_t*next = l->next;
-	if(deletefonts && l->font) {
-	    gfxfont_free(l->font);l->font=0;
-	}
-	l->next = 0;
-	free(l);
-	l = next;
+    gfxfontlist_t*next = l->next;
+    if(deletefonts && l->font) {
+        gfxfont_free(l->font);l->font=0;
+    }
+    l->next = 0;
+    free(l);
+    l = next;
     }
 }
 
@@ -946,20 +946,20 @@ gfxline_t*gfxline_makerectangle(double x1,double y1,double x2, double y2)
 
 gfxline_t*gfxline_makecircle(double x,double y,double rx, double ry)
 {
-    double C1 = 0.2930;    
-    double C2 = 0.4140;   
-    double begin = 0.7070; 
+    double C1 = 0.2930;
+    double C2 = 0.4140;
+    double begin = 0.7070;
     gfxline_t** line = (gfxline_t**)rfx_calloc(sizeof(gfxline_t*)*9);
     int t;
     for(t=0;t<9;t++) {
-	line[t] = rfx_calloc(sizeof(gfxline_t));
+    line[t] = rfx_calloc(sizeof(gfxline_t));
     }
     line[0]->type = gfx_moveTo;
     line[0]->x = x+begin*rx;
     line[0]->y = y+begin*ry;
     for(t=1;t<9;t++) {
-	line[t-1]->next = line[t];
-	line[t]->type = gfx_splineTo;
+    line[t-1]->next = line[t];
+    line[t]->type = gfx_splineTo;
     }
     line[8]->next = 0;
 #define R(nr,cx,cy,mx,my) \
@@ -1063,7 +1063,7 @@ void gfximage_transform(gfximage_t*img, gfxcxform_t*cxform)
     bb = (int)(cxform->bb*256);ab = (int)(cxform->ab*256);tb = (int)(cxform->tb*256);
     ba = (int)(cxform->ba*256);aa = (int)(cxform->aa*256);ta = (int)(cxform->ta*256);
 
-    for(t=0;t<size;t++) {
+	for(t=0;t<size;t++) {
 	gfxcolor_t*pixel = &img->data[t];
 	unsigned char r = (pixel->r * rr + pixel->g * rg + pixel->b * rb + pixel->a * ra + tr) / 256;
 	unsigned char g = (pixel->r * gr + pixel->g * gg + pixel->b * gb + pixel->a * ga + tg) / 256;
@@ -1073,20 +1073,20 @@ void gfximage_transform(gfximage_t*img, gfxcxform_t*cxform)
 	pixel->g = g;
 	pixel->b = b;
 	pixel->a = a;
-    }
+	}
 }
 void gfxline_dump(gfxline_t*line, FILE*fi, char*prefix)
 {
-    while(line) {
+	while(line) {
 	if(line->type == gfx_moveTo) {
-	    fprintf(fi, "%smoveTo %.2f %.2f\n", prefix, line->x, line->y);
+		fprintf(fi, "%smoveTo %.2f %.2f\n", prefix, line->x, line->y);
 	} else if(line->type == gfx_lineTo) {
-	    fprintf(fi, "%slineTo %.2f %.2f\n", prefix, line->x, line->y);
+		fprintf(fi, "%slineTo %.2f %.2f\n", prefix, line->x, line->y);
 	} else if(line->type == gfx_splineTo) {
-	    fprintf(fi, "%ssplineTo (%.2f %.2f) %.2f %.2f\n", prefix, line->sx, line->sy, line->x, line->y);
+		fprintf(fi, "%ssplineTo (%.2f %.2f) %.2f %.2f\n", prefix, line->sx, line->sy, line->x, line->y);
 	}
 	line = line->next;
-    }
+	}
 }
 
 static char gfxpoint_equals(void*c1, void*c2)
@@ -1108,10 +1108,10 @@ static void gfxpoint_destroy(void*c)
     free(c);
 }
 static type_t gfxpoint_type = {
-    hash: (hash_func)gfxpoint_hash,
-    equals: (equals_func)gfxpoint_equals,
-    dup: (dup_func)gfxpoint_clone,
-    free: (free_func)gfxpoint_destroy,
+    (equals_func)gfxpoint_equals,
+    (hash_func)gfxpoint_hash,
+    (dup_func)gfxpoint_clone,
+    (free_func)gfxpoint_destroy,
 };
 
 /* makes sure that a gfxline is drawn in a single stroke.
@@ -1124,106 +1124,106 @@ gfxline_t* gfxline_restitch(gfxline_t*line)
 {
     dict_t*ff = dict_new2(&gfxpoint_type);
     dict_t*rev = dict_new2(&gfxpoint_type);
-    
+
     gfxline_t*prev=0;
     while(line) {
-	gfxline_t*next = line->next;
-	if(line->type == gfx_moveTo && (line->next && line->next->type != gfx_moveTo)) {
-	    gfxpoint_t xy = {line->x, line->y};
-	    dict_put(ff, &xy, line);
-	    prev = line;
-	} else if(!line->next || line->next->type == gfx_moveTo) {
-	    if(prev) {
-		gfxpoint_t xy = {line->x, line->y};
-		dict_put(rev, &xy, prev);
-		line->next = 0;
-		prev=0;
-	    }
-	}
-	line = next;
+    gfxline_t*next = line->next;
+    if(line->type == gfx_moveTo && (line->next && line->next->type != gfx_moveTo)) {
+        gfxpoint_t xy = {line->x, line->y};
+        dict_put(ff, &xy, line);
+        prev = line;
+    } else if(!line->next || line->next->type == gfx_moveTo) {
+        if(prev) {
+        gfxpoint_t xy = {line->x, line->y};
+        dict_put(rev, &xy, prev);
+        line->next = 0;
+        prev=0;
+        }
     }
-   
+    line = next;
+    }
+
     gfxpoint_t pos = {0,0};
 
     gfxline_t*result = 0;
     gfxline_t*last = 0;
-   
+
     char first = 1;
     while(dict_count(ff)) {
-	char reverse = 0, stitch = 1;
-	gfxline_t*l = dict_lookup(ff, &pos);
-	if(l) {
-	    char d = dict_del2(ff,&pos,l);assert(d);
-	} else {
-	    l = dict_lookup(rev, &pos);
-	    if(l) {
-		reverse = 1;
-		char d = dict_del2(rev,&pos,l);assert(d);
-	    }
-	}
-	if(!l) {
-	    /* try to find *any* entry. this is costly, but
-	       doesn't happen too often */
-	    stitch = 0;
-	    DICT_ITERATE_DATA(ff, gfxline_t*, l2) {
-		l = l2;
-		break;
-	    }
-	    assert(l);
-	    gfxpoint_t xy = {l->x,l->y};
-	    char d = dict_del2(ff,&xy,l);assert(d);
-	}
-	
+    char reverse = 0, stitch = 1;
+    gfxline_t*l = dict_lookup(ff, &pos);
+    if(l) {
+        char d = dict_del2(ff,&pos,l);assert(d);
+    } else {
+        l = dict_lookup(rev, &pos);
+        if(l) {
+        reverse = 1;
+        char d = dict_del2(rev,&pos,l);assert(d);
+        }
+    }
+    if(!l) {
+        /* try to find *any* entry. this is costly, but
+           doesn't happen too often */
+        stitch = 0;
+        DICT_ITERATE_DATA(ff, gfxline_t*, l2) {
+        l = l2;
+        break;
+        }
+        assert(l);
+        gfxpoint_t xy = {l->x,l->y};
+        char d = dict_del2(ff,&xy,l);assert(d);
+    }
+
 	gfxline_t*end = l;
 	if(!reverse) {
-	    while(end->next) end = end->next;
-	    pos.x = end->x;
-	    pos.y = end->y;
-	    char d = dict_del2(rev,&pos,l);assert(d);
+		while(end->next) end = end->next;
+		pos.x = end->x;
+		pos.y = end->y;
+		char d = dict_del2(rev,&pos,l);assert(d);
 	} else {
-	    l = gfxline_reverse(l);
-	    pos.x = end->x;
-	    pos.y = end->y;
-	    char d = dict_del2(ff,&pos,end);assert(d);
+		l = gfxline_reverse(l);
+		pos.x = end->x;
+		pos.y = end->y;
+		char d = dict_del2(ff,&pos,end);assert(d);
 	}
 
 	assert(l->type == gfx_moveTo);
 	if(stitch && !first) {
-	    /* cut away the moveTo */
-	    gfxline_t*next = l->next;
-	    free(l);
-	    l = next;
+		/* cut away the moveTo */
+		gfxline_t*next = l->next;
+		free(l);
+		l = next;
 	}
 
 	if(!last) {
-	    result = l;
-	    last = end;
+		result = l;
+		last = end;
 	} else {
-	    last->next = l;
-	    last = end;
+		last->next = l;
+		last = end;
 	}
 	first = 0;
-    }
-    dict_destroy(ff);
-    dict_destroy(rev);
-    return result;
+	}
+	dict_destroy(ff);
+	dict_destroy(rev);
+	return result;
 }
 
 gfxline_t* gfxline_reverse(gfxline_t*line)
 {
     gfxline_t*b = 0;
     while(line) {
-	gfxline_t*next = line->next;
-	if(next && next->type != gfx_moveTo) {
-	    line->type = next->type;
-	    line->sx = next->sx;
-	    line->sy = next->sy;
-	} else {
-	    line->type = gfx_moveTo;
-	}
-	line->next = b;
-	b = line;
-	line = next;
+    gfxline_t*next = line->next;
+    if(next && next->type != gfx_moveTo) {
+        line->type = next->type;
+        line->sx = next->sx;
+        line->sy = next->sy;
+    } else {
+        line->type = gfx_moveTo;
+    }
+    line->next = b;
+    b = line;
+    line = next;
     }
     return b;
 }
@@ -1232,7 +1232,7 @@ void gfxline_normalize(gfxline_t*line, double sizex, double sizey)
 {
     gfxbbox_t b = gfxline_getbbox(line);
     if(b.xmax == b.xmin || b.ymax == b.ymin)
-	return;
+    return;
     gfxmatrix_t m;
     double w = b.xmax - b.xmin;
     double h = b.ymax - b.ymin;
@@ -1250,16 +1250,16 @@ void gfxline_normalize(gfxline_t*line, double sizex, double sizey)
 
 void gfxgradient_destroy(gfxgradient_t*gradient)
 {
-    while(gradient) {
+	while(gradient) {
 	gfxgradient_t*next = gradient->next;
 	free(gradient);
 	gradient = next;
-    }
+	}
 }
 
 gfxparams_t* gfxparams_new()
 {
-    return (gfxparams_t*)rfx_calloc(sizeof(gfxparams_t));
+	return (gfxparams_t*)rfx_calloc(sizeof(gfxparams_t));
 }
 
 void gfxparams_store(gfxparams_t*params, const char*key, const char*value)
@@ -1279,24 +1279,24 @@ void gfxparams_store(gfxparams_t*params, const char*key, const char*value)
     p->value = strdup(value);
     p->next = 0;
 
-    if(params->last) {
+	if(params->last) {
 	params->last->next = p;
 	params->last = p;
-    } else {
+	} else {
 	params->params = p;
 	params->last = p;
-    }
+	}
 }
 
 void gfxparams_free(gfxparams_t*params)
 {
     gfxparam_t*p = params->params;
     while(p) {
-	gfxparam_t*next = p->next;
-	free((void*)p->key);
-	if(p->value) free((void*)p->value);
-	free(p);
-	p = next;
+    gfxparam_t*next = p->next;
+    free((void*)p->key);
+    if(p->value) free((void*)p->value);
+    free(p);
+    p = next;
     }
     free(params);
 }

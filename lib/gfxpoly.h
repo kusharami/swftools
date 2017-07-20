@@ -1,10 +1,10 @@
-/* gfxpoly.h 
+/* gfxpoly.h
 
    Various boolean polygon functions.
 
    Part of the swftools package.
 
-   Copyright (c) 2005 Matthias Kramm <kramm@quiss.org> 
+   Copyright (c) 2005 Matthias Kramm <kramm@quiss.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,9 @@ extern "C" {
 #define DEFAULT_GRID (0.05)
 
 typedef struct _gfxpoly {
+#ifdef _MSC_VER
+    char *any[];
+#endif
 } gfxpoly_t;
 
 void gfxpoly_destroy(gfxpoly_t*poly);

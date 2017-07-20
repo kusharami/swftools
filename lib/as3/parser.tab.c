@@ -2,20 +2,20 @@
 /* A Bison parser, made by GNU Bison 2.4.2.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-   
+
       Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-   
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -28,7 +28,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -93,6 +93,7 @@
 #include "expr.h"
 #include "initcode.h"
 #include "parser_help.h"
+#include "builtin.h"
 
 extern int a3_lex();
 
@@ -241,7 +242,7 @@ extern int a3_lex();
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union 
+typedef union
 /* Line 223 of skeleton.m4  */
 #line 48 "parser.y"
 tokenunion
@@ -381,7 +382,7 @@ tokenunion
 
         /* slot name */
         multiname_t mname = {QNAME, &ns, 0, name};
-      
+
         trait_list_t**traits;
         code_t**code=0;
         if(!state->cls) {
@@ -398,16 +399,16 @@ tokenunion
             // instance variable
             traits = &state->cls->abc->traits;
             code = &state->cls->init->header;
-            
+
             if(ns.access == ACCESS_PROTECTED) {
                 ns.name = concat3(state->cls->info->package,":",state->cls->info->name);
             }
         }
         if(c)
             *c = code;
-        if(m) 
+        if(m)
             *m = *multiname_clone(&mname);
-            
+
         return trait_new_member(traits, 0, multiname_clone(&mname), 0);
     }
 
@@ -424,38 +425,38 @@ tokenunion
     node_t* resolve_identifier(const char*name);
     node_t* get_descendants(node_t*e,const char*ns,const char*subnode,char multi, char attr)
     {
-	typedcode_t v = node_read(e);
-	typedcode_t w;
+    typedcode_t v = node_read(e);
+    typedcode_t w;
 
 	multiname_t m = {0,0,0,subnode};
 	namespace_t zero = {ZERONAMESPACE,"*"};
 	if(!strcmp(ns,"*")) {
-	    m.ns = &zero;
-	    m.type = attr?QNAMEA:QNAME;
+		m.ns = &zero;
+		m.type = attr?QNAMEA:QNAME;
 	} else {
-	    typedcode_t w = node_read(resolve_identifier(ns));
-	    if(!TYPE_IS_NAMESPACE(w.t)) {
+		typedcode_t w = node_read(resolve_identifier(ns));
+		if(!TYPE_IS_NAMESPACE(w.t)) {
 		as3_softwarning("%s might not be a namespace", ns);
-	    }
-	    v.c = code_append(v.c, w.c);
-	    v.c = converttype(v.c, w.t, TYPE_NAMESPACE);
-	    m.type = attr?RTQNAMEA:RTQNAME;
+		}
+		v.c = code_append(v.c, w.c);
+		v.c = converttype(v.c, w.t, TYPE_NAMESPACE);
+		m.type = attr?RTQNAMEA:RTQNAME;
 	}
 
 	if(!multi) {
-	    v.c = abc_getproperty2(v.c, &m);
+		v.c = abc_getproperty2(v.c, &m);
 	} else {
-	    v.c = abc_getdescendants2(v.c, &m);
+		v.c = abc_getdescendants2(v.c, &m);
 	}
 
 	if(TYPE_IS_XML(v.t)) {
-	    v.t = TYPE_XMLLIST;
+		v.t = TYPE_XMLLIST;
 	} else {
-	    v.c = abc_coerce_a(v.c);
-	    v.t = TYPE_ANY;
+		v.c = abc_coerce_a(v.c);
+		v.t = TYPE_ANY;
 	}
 	return mkcodenode(v);
-    }
+	}
 
 
 /* Line 274 of skeleton.m4  */
@@ -464,9 +465,9 @@ tokenunion
     node_t* var_read(variable_t*v)
     {
         typedcode_t o;
-	o.c = abc_getlocal(0, v->index);
-	o.t = v->type;
-	return mkcodenode(o);
+    o.c = abc_getlocal(0, v->index);
+    o.t = v->type;
+    return mkcodenode(o);
     }
 
     node_t* resolve_identifier(const char*name)
@@ -482,7 +483,7 @@ tokenunion
         /* look at variables */
         if((v = find_variable(state, name))) {
             // name is a local variable
-	    return var_read(v);
+        return var_read(v);
         }
         if((v = find_slot(state->method, name))) {
             o.c = abc_getscopeobject(o.c, 1);
@@ -493,35 +494,35 @@ tokenunion
 
         int i_am_static = state->method->is_static;
 
-        if(!state->method->inner && !state->xmlfilter && state->cls)
+		if(!state->method->inner && !state->xmlfilter && state->cls)
 	{
-	    /* look at current class' members */
-	    if((f = findmember_nsset(state->cls->info, name, 1, i_am_static)))
-	    {
+		/* look at current class' members */
+		if((f = findmember_nsset(state->cls->info, name, 1, i_am_static)))
+		{
 		// name is a member or attribute in this class
 		int var_is_static = (f->flags&FLAG_STATIC);
 
 		if(f->kind == INFOTYPE_VAR && (f->flags&FLAG_CONST)) {
-		    /* if the variable is a constant (and we know what is evaluates to), we
-		       can just use the value itself */
-		    varinfo_t*v = (varinfo_t*)f;
-		    if(v->value) {
+			/* if the variable is a constant (and we know what is evaluates to), we
+			   can just use the value itself */
+			varinfo_t*v = (varinfo_t*)f;
+			if(v->value) {
 			return mkconstnode(v->value);
-		    }
+			}
 		}
-	       
-		if(var_is_static >= i_am_static) {
-		    if(f->kind == INFOTYPE_METHOD) {
-			o.t = TYPE_FUNCTION(f);
-		    } else {
-			o.t = f->type;
-		    }
 
-		    if(var_is_static && !i_am_static) {
-		    /* access to a static member from a non-static location.
-		       do this via findpropstrict:
-		       there doesn't seem to be any non-lookup way to access
-		       static properties of a class */
+		if(var_is_static >= i_am_static) {
+			if(f->kind == INFOTYPE_METHOD) {
+			o.t = TYPE_FUNCTION(f);
+			} else {
+			o.t = f->type;
+			}
+
+			if(var_is_static && !i_am_static) {
+			/* access to a static member from a non-static location.
+			   do this via findpropstrict:
+			   there doesn't seem to be any non-lookup way to access
+			   static properties of a class */
 			state->method->late_binding = 1;
 			o.t = f->type;
 			namespace_t ns = {f->access, f->package};
@@ -529,33 +530,33 @@ tokenunion
 			o.c = abc_findpropstrict2(o.c, &m);
 			o.c = abc_getproperty2(o.c, &m);
 			return mkcodenode(o);
-		    } else if(f->slot>0) {
+			} else if(f->slot>0) {
 			o.c = abc_getlocal_0(o.c);
 			o.c = abc_getslot(o.c, f->slot);
 			return mkcodenode(o);
-		    } else {
+			} else {
 			MEMBER_MULTINAME(m, f, name);
 			o.c = abc_getlocal_0(o.c);
 			o.c = abc_getproperty2(o.c, &m);
 			return mkcodenode(o);
-		    }
+			}
 		}
-	    } 
-	    /* special case: it's allowed to access non-static constants
-	       from a static context */
-	    if(i_am_static && (f=findmember_nsset(state->cls->info, name, 1, 0))) {
+		}
+		/* special case: it's allowed to access non-static constants
+		   from a static context */
+		if(i_am_static && (f=findmember_nsset(state->cls->info, name, 1, 0))) {
 		if(f->kind == INFOTYPE_VAR && (f->flags&FLAG_CONST)) {
-		    varinfo_t*v = (varinfo_t*)f;
-		    if(v->value) {
+			varinfo_t*v = (varinfo_t*)f;
+			if(v->value) {
 			return mkconstnode(v->value);
-		    }
+			}
 		}
-	    }
+		}
 	}
-        
+
         /* look at actual classes, in the current package and imported */
         if(!state->xmlfilter && (a = find_class(name))) {
-	    registry_use(a);
+        registry_use(a);
             if(state->cls && state->cls->info == (classinfo_t*)a && i_am_static) {
                 o.c = abc_getlocal_0(0);
                 o.t = TYPE_CLASS((classinfo_t*)a);
@@ -566,8 +567,8 @@ tokenunion
         }
 
         /* look through package prefixes */
-        if(!state->xmlfilter && 
-           (dict_contains(state->import_toplevel_packages, name) || 
+        if(!state->xmlfilter &&
+           (dict_contains(state->import_toplevel_packages, name) ||
             registry_ispackage(name))) {
             o.c = abc___pushpackage__(o.c, (char*)name);
             o.t = 0;
@@ -581,7 +582,7 @@ tokenunion
                 as3_warning("Couldn't resolve '%s', doing late binding", name);
             }
             state->method->late_binding = 1;
-                    
+
             multiname_t m = {MULTINAME, 0, &nopackage_namespace_set, name};
 
             o.t = 0;
@@ -736,8 +737,8 @@ YYID (yyi)
 #   define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
 #  endif
 #  if (defined __cplusplus && ! defined _STDLIB_H \
-       && ! ((defined YYMALLOC || defined malloc) \
-	     && (defined YYFREE || defined free)))
+	   && ! ((defined YYMALLOC || defined malloc) \
+		 && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
 #   ifndef _STDLIB_H
 #    define _STDLIB_H 1
@@ -762,7 +763,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 
 #if (! defined yyoverflow \
-     && (! defined __cplusplus \
+	 && (! defined __cplusplus \
 	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
@@ -786,16 +787,16 @@ union yyalloc
 # ifndef YYCOPY
 #  if defined __GNUC__ && 1 < __GNUC__
 #   define YYCOPY(To, From, Count) \
-      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
+	  __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
 #  else
 #   define YYCOPY(To, From, Count)		\
-      do					\
+	  do					\
 	{					\
 	  YYSIZE_T yyi;				\
 	  for (yyi = 0; yyi < (Count); yyi++)	\
-	    (To)[yyi] = (From)[yyi];		\
+		(To)[yyi] = (From)[yyi];		\
 	}					\
-      while (YYID (0))
+	  while (YYID (0))
 #  endif
 # endif
 
@@ -807,11 +808,11 @@ union yyalloc
 # define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
     do									\
       {									\
-	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
-	Stack = &yyptr->Stack_alloc;					\
-	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-	yyptr += yynewbytes / sizeof (*yyptr);				\
+    YYSIZE_T yynewbytes;						\
+    YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
+    Stack = &yyptr->Stack_alloc;					\
+    yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
+    yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
     while (YYID (0))
 
@@ -2169,19 +2170,19 @@ while (YYID (0))
 # define YYLLOC_DEFAULT(Current, Rhs, N)				\
     do									\
       if (YYID (N))                                                    \
-	{								\
-	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
-	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
-	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
-	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
-	}								\
+    {								\
+      (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
+      (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
+      (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
+      (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
+    }								\
       else								\
-	{								\
-	  (Current).first_line   = (Current).last_line   =		\
-	    YYRHSLOC (Rhs, 0).last_line;				\
-	  (Current).first_column = (Current).last_column =		\
-	    YYRHSLOC (Rhs, 0).last_column;				\
-	}								\
+    {								\
+      (Current).first_line   = (Current).last_line   =		\
+        YYRHSLOC (Rhs, 0).last_line;				\
+      (Current).first_column = (Current).last_column =		\
+        YYRHSLOC (Rhs, 0).last_column;				\
+    }								\
     while (YYID (0))
 #endif
 
@@ -2193,9 +2194,9 @@ while (YYID (0))
 #ifndef YY_LOCATION_PRINT
 # if YYLTYPE_IS_TRIVIAL
 #  define YY_LOCATION_PRINT(File, Loc)			\
-     fprintf (File, "%d.%d-%d.%d",			\
-	      (Loc).first_line, (Loc).first_column,	\
-	      (Loc).last_line,  (Loc).last_column)
+	 fprintf (File, "%d.%d-%d.%d",			\
+		  (Loc).first_line, (Loc).first_column,	\
+		  (Loc).last_line,  (Loc).last_column)
 # else
 #  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
 # endif
@@ -2230,7 +2231,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value); \
+          Type, Value); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -2264,7 +2265,7 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
   switch (yytype)
     {
       default:
-	break;
+    break;
     }
 }
 
@@ -2345,14 +2346,14 @@ yy_reduce_print (yyvsp, yyrule)
   int yyi;
   unsigned long int yylno = yyrline[yyrule];
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
-	     yyrule - 1, yylno);
+         yyrule - 1, yylno);
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
-		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+               &(yyvsp[(yyi + 1) - (yynrhs)])
+                           );
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -2390,7 +2391,7 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
-
+
 
 #if YYERROR_VERBOSE
 
@@ -2461,30 +2462,30 @@ yytnamerr (char *yyres, const char *yystr)
       YYSIZE_T yyn = 0;
       char const *yyp = yystr;
 
-      for (;;)
+	  for (;;)
 	switch (*++yyp)
 	  {
 	  case '\'':
 	  case ',':
-	    goto do_not_strip_quotes;
+		goto do_not_strip_quotes;
 
 	  case '\\':
-	    if (*++yyp != '\\')
-	      goto do_not_strip_quotes;
-	    /* Fall through.  */
+		if (*++yyp != '\\')
+		  goto do_not_strip_quotes;
+		/* Fall through.  */
 	  default:
-	    if (yyres)
-	      yyres[yyn] = *yyp;
-	    yyn++;
-	    break;
+		if (yyres)
+		  yyres[yyn] = *yyp;
+		yyn++;
+		break;
 
 	  case '"':
-	    if (yyres)
-	      yyres[yyn] = '\0';
-	    return yyn;
+		if (yyres)
+		  yyres[yyn] = '\0';
+		return yyn;
 	  }
-    do_not_strip_quotes: ;
-    }
+	do_not_strip_quotes: ;
+	}
 
   if (! yyres)
     return yystrlen (yystr);
@@ -2519,13 +2520,13 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
       int yyx;
 
 # if 0
-      /* This is so xgettext sees the translatable formats that are
+	  /* This is so xgettext sees the translatable formats that are
 	 constructed on the fly.  */
-      YY_("syntax error, unexpected %s");
-      YY_("syntax error, unexpected %s, expecting %s");
-      YY_("syntax error, unexpected %s, expecting %s or %s");
-      YY_("syntax error, unexpected %s, expecting %s or %s or %s");
-      YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
+	  YY_("syntax error, unexpected %s");
+	  YY_("syntax error, unexpected %s, expecting %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s or %s");
+	  YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
 # endif
       char *yyfmt;
       char const *yyf;
@@ -2533,14 +2534,14 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
       static char const yyexpecting[] = ", expecting %s";
       static char const yyor[] = " or %s";
       char yyformat[sizeof yyunexpected
-		    + sizeof yyexpecting - 1
-		    + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
-		       * (sizeof yyor - 1))];
+            + sizeof yyexpecting - 1
+            + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
+               * (sizeof yyor - 1))];
       char const *yyprefix = yyexpecting;
 
-      /* Start YYX at -YYN if negative to avoid negative indexes in
+	  /* Start YYX at -YYN if negative to avoid negative indexes in
 	 YYCHECK.  */
-      int yyxbegin = yyn < 0 ? -yyn : 0;
+	  int yyxbegin = yyn < 0 ? -yyn : 0;
 
       /* Stay within bounds of both yycheck and yytname.  */
       int yychecklim = YYLAST - yyn + 1;
@@ -2550,22 +2551,22 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
       yyarg[0] = yytname[yytype];
       yyfmt = yystpcpy (yyformat, yyunexpected);
 
-      for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+	  for (yyx = yyxbegin; yyx < yyxend; ++yyx)
 	if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
 	  {
-	    if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-	      {
+		if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+		  {
 		yycount = 1;
 		yysize = yysize0;
 		yyformat[sizeof yyunexpected - 1] = '\0';
 		break;
-	      }
-	    yyarg[yycount++] = yytname[yyx];
-	    yysize1 = yysize + yytnamerr (0, yytname[yyx]);
-	    yysize_overflow |= (yysize1 < yysize);
-	    yysize = yysize1;
-	    yyfmt = yystpcpy (yyfmt, yyprefix);
-	    yyprefix = yyor;
+		  }
+		yyarg[yycount++] = yytname[yyx];
+		yysize1 = yysize + yytnamerr (0, yytname[yyx]);
+		yysize_overflow |= (yysize1 < yysize);
+		yysize = yysize1;
+		yyfmt = yystpcpy (yyfmt, yyprefix);
+		yyprefix = yyor;
 	  }
 
       yyf = YY_(yyformat);
@@ -2573,35 +2574,35 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
       yysize_overflow |= (yysize1 < yysize);
       yysize = yysize1;
 
-      if (yysize_overflow)
+	  if (yysize_overflow)
 	return YYSIZE_MAXIMUM;
 
-      if (yyresult)
+	  if (yyresult)
 	{
 	  /* Avoid sprintf, as that infringes on the user's name space.
-	     Don't have undefined behavior even if the translation
-	     produced a string with the wrong number of "%s"s.  */
+		 Don't have undefined behavior even if the translation
+		 produced a string with the wrong number of "%s"s.  */
 	  char *yyp = yyresult;
 	  int yyi = 0;
 	  while ((*yyp = *yyf) != '\0')
-	    {
-	      if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
+		{
+		  if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
 		{
 		  yyp += yytnamerr (yyp, yyarg[yyi++]);
 		  yyf += 2;
 		}
-	      else
+		  else
 		{
 		  yyp++;
 		  yyf++;
 		}
-	    }
+		}
 	}
-      return yysize;
-    }
+	  return yysize;
+	}
 }
 #endif /* YYERROR_VERBOSE */
-
+
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
@@ -2629,9 +2630,9 @@ yydestruct (yymsg, yytype, yyvaluep)
   switch (yytype)
     {
 
-      default:
+	  default:
 	break;
-    }
+	}
 }
 
 /* Prevent warnings from -Wmissing-prototypes.  */
@@ -2771,7 +2772,7 @@ yyparse ()
       YYSIZE_T yysize = yyssp - yyss + 1;
 
 #ifdef yyoverflow
-      {
+	  {
 	/* Give user a chance to reallocate the stack.  Use copies of
 	   these so that the &'s don't force the real ones into
 	   memory.  */
@@ -2783,25 +2784,25 @@ yyparse ()
 	   conditional around just the two extra args, but that might
 	   be undefined if yyoverflow is a macro.  */
 	yyoverflow (YY_("memory exhausted"),
-		    &yyss1, yysize * sizeof (*yyssp),
-		    &yyvs1, yysize * sizeof (*yyvsp),
-		    &yystacksize);
+			&yyss1, yysize * sizeof (*yyssp),
+			&yyvs1, yysize * sizeof (*yyvsp),
+			&yystacksize);
 
 	yyss = yyss1;
 	yyvs = yyvs1;
-      }
+	  }
 #else /* no yyoverflow */
 # ifndef YYSTACK_RELOCATE
       goto yyexhaustedlab;
 # else
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-	goto yyexhaustedlab;
+    goto yyexhaustedlab;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
-	yystacksize = YYMAXDEPTH;
+    yystacksize = YYMAXDEPTH;
 
-      {
+	  {
 	yytype_int16 *yyss1 = yyss;
 	union yyalloc *yyptr =
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
@@ -2812,19 +2813,19 @@ yyparse ()
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
-      }
+	  }
 # endif
 #endif /* no yyoverflow */
 
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
-      YYDPRINTF ((stderr, "Stack size increased to %lu\n",
+	  YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
-      if (yyss + yystacksize - 1 <= yyssp)
+	  if (yyss + yystacksize - 1 <= yyssp)
 	YYABORT;
-    }
+	}
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
@@ -2875,7 +2876,7 @@ yybackup:
   if (yyn <= 0)
     {
       if (yyn == 0 || yyn == YYTABLE_NINF)
-	goto yyerrlab;
+    goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
@@ -2928,7 +2929,7 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        
+
     case 23:
     if(as3_pass==2) {
 
@@ -2939,7 +2940,7 @@ yyreduce:
     break;
 
 
-  
+
     case 25:
     if(as3_pass==2) {
 
@@ -2950,7 +2951,7 @@ yyreduce:
     break;
 
 
-  
+
     case 26:
     if(as3_pass==2) {
 
@@ -2961,7 +2962,7 @@ yyreduce:
     break;
 
 
-  
+
     case 27:
     if(as3_pass==2) {
 
@@ -2974,7 +2975,7 @@ yyreduce:
     break;
 
 
-  
+
     case 28:
     if(as3_pass==2) {
 
@@ -2985,7 +2986,7 @@ yyreduce:
     break;
 
 
-  
+
     case 42:
     if(as3_pass==2) {
 
@@ -2996,7 +2997,7 @@ yyreduce:
     break;
 
 
-  
+
     case 43:
     if(as3_pass==2) {
 
@@ -3007,7 +3008,7 @@ yyreduce:
     break;
 
 
-  
+
     case 44:
     if(as3_pass==2) {
 
@@ -3018,7 +3019,7 @@ yyreduce:
     break;
 
 
-  
+
     case 51:
     if(as3_pass==2) {
 
@@ -3029,7 +3030,7 @@ yyreduce:
     break;
 
 
-  
+
     case 52:
     if(as3_pass==2) {
 
@@ -3040,7 +3041,7 @@ yyreduce:
     break;
 
 
-  
+
     case 53:
     if(as3_pass==2) {
 
@@ -3048,7 +3049,7 @@ yyreduce:
 #line 372 "parser.y"
     {
     if((yyvsp[(1) - (1)].code)) {
-        if(!global->init) 
+        if(!global->init)
             global->init = abc_initscript(global->file);
         code_t**cc = &global->init->method->body->code;
         *cc = code_append(*cc, (yyvsp[(1) - (1)].code));
@@ -3058,7 +3059,7 @@ yyreduce:
     break;
 
 
-  
+
     case 54:
     if(as3_pass==2) {
 
@@ -3073,7 +3074,7 @@ yyreduce:
     break;
 
 
-  
+
     case 55:
     if(as3_pass==2) {
 
@@ -3084,7 +3085,7 @@ yyreduce:
     break;
 
 
-  
+
     case 56:
     if(as3_pass==2) {
 
@@ -3095,7 +3096,7 @@ yyreduce:
     break;
 
 
-  
+
     case 57:
     if(as3_pass==2) {
 
@@ -3106,7 +3107,7 @@ yyreduce:
     break;
 
 
-  
+
     case 58:
     if(as3_pass==2) {
 
@@ -3117,7 +3118,7 @@ yyreduce:
     break;
 
 
-  
+
     case 59:
     if(as3_pass==2) {
 
@@ -3128,7 +3129,7 @@ yyreduce:
     break;
 
 
-  
+
     case 60:
     if(as3_pass==2) {
 
@@ -3139,7 +3140,7 @@ yyreduce:
     break;
 
 
-  
+
     case 61:
     if(as3_pass==2) {
 
@@ -3147,12 +3148,12 @@ yyreduce:
 #line 428 "parser.y"
     {
 PASS12
-    if(variable_exists((yyvsp[(1) - (3)].id))) 
+    if(variable_exists((yyvsp[(1) - (3)].id)))
         syntaxerror("Variable %s already defined", (yyvsp[(1) - (3)].id));
 PASS1
     new_variable(state->method, (yyvsp[(1) - (3)].id), (yyvsp[(2) - (3)].classinfo), 1, 0);
 PASS2
-   
+
     char slot = 0;
     int index = 0;
     variable_t*v = 0;
@@ -3170,7 +3171,7 @@ PASS2
     }
 
     (yyval.code) = slot?abc_getscopeobject(0, 1):0;
-    
+
     typedcode_t val = node_read((yyvsp[(3) - (3)].node));
     if(!is_subtype_of(val.t, (yyvsp[(2) - (3)].classinfo))) {
         syntaxerror("Can't convert %s to %s", val.t->name, (yyvsp[(2) - (3)].classinfo)->name);
@@ -3206,7 +3207,7 @@ PASS2
     break;
 
 
-  
+
     case 62:
     if(as3_pass==2) {
 
@@ -3217,7 +3218,7 @@ PASS2
     break;
 
 
-  
+
     case 63:
     if(as3_pass==2) {
 
@@ -3231,7 +3232,7 @@ PASS2
     break;
 
 
-  
+
     case 64:
     if(as3_pass==2) {
 
@@ -3242,7 +3243,7 @@ PASS2
     break;
 
 
-  
+
     case 65:
     if(as3_pass==2) {
 
@@ -3253,7 +3254,7 @@ PASS2
     break;
 
 
-  
+
     case 66:
     if(as3_pass==2) {
 
@@ -3263,7 +3264,7 @@ PASS2
     (yyval.code) = code_new();
     (yyval.code) = code_append((yyval.code), (yyvsp[(3) - (6)].value).c);
     code_t*myjmp,*myif = (yyval.code) = abc_iffalse((yyval.code), 0);
-   
+
     (yyval.code) = code_append((yyval.code), (yyvsp[(5) - (6)].code));
     if((yyvsp[(6) - (6)].code)) {
         myjmp = (yyval.code) = abc_jump((yyval.code), 0);
@@ -3278,7 +3279,7 @@ PASS2
     break;
 
 
-  
+
     case 67:
     if(as3_pass==2) {
 
@@ -3289,7 +3290,7 @@ PASS2
     break;
 
 
-  
+
     case 70:
     if(as3_pass==2) {
 
@@ -3303,7 +3304,7 @@ PASS2
     break;
 
 
-  
+
     case 71:
     if(as3_pass==2) {
 
@@ -3317,7 +3318,7 @@ PASS2
     break;
 
 
-  
+
     case 72:
     if(as3_pass==2) {
 
@@ -3328,7 +3329,7 @@ PASS2
     break;
 
 
-  
+
     case 73:
     if(as3_pass==2) {
 
@@ -3339,7 +3340,7 @@ PASS2
     break;
 
 
-  
+
     case 74:
     if(as3_pass==2) {
 
@@ -3368,7 +3369,7 @@ PASS2
     break;
 
 
-  
+
     case 75:
     if(as3_pass==2) {
 
@@ -3377,7 +3378,7 @@ PASS2
     {
     node_t*n = resolve_identifier((yyvsp[(2) - (6)].id));
     typedcode_t w = node_write(n);
-    
+
     int it = alloc_local();
     int array = alloc_local();
 
@@ -3389,7 +3390,7 @@ PASS2
     (yyval.code) = abc_setlocal((yyval.code), it);
 
     code_t*loopstart = (yyval.code) = abc_label((yyval.code));
-    
+
     (yyval.code) = abc_hasnext2((yyval.code), array, it);
     code_t*myif = (yyval.code) = abc_iffalse((yyval.code), 0);
     (yyval.code) = abc_getlocal((yyval.code), array);
@@ -3404,11 +3405,11 @@ PASS2
 
     (yyval.code) = code_append((yyval.code), (yyvsp[(6) - (6)].code));
     (yyval.code) = abc_jump((yyval.code), loopstart);
-    
+
     code_t*out = (yyval.code) = abc_nop((yyval.code));
     breakjumpsto((yyval.code), (yyvsp[(1) - (6)].for_start).name, out);
     continuejumpsto((yyval.code), (yyvsp[(1) - (6)].for_start).name, loopstart);
-    
+
     myif->branch = out;
 
     (yyval.code) = abc_kill((yyval.code), it);
@@ -3421,7 +3422,7 @@ PASS2
     break;
 
 
-  
+
     case 76:
     if(as3_pass==2) {
 
@@ -3446,7 +3447,7 @@ PASS2
     break;
 
 
-  
+
     case 77:
     if(as3_pass==2) {
 
@@ -3467,7 +3468,7 @@ PASS2
     break;
 
 
-  
+
     case 78:
     if(as3_pass==2) {
 
@@ -3480,7 +3481,7 @@ PASS2
     break;
 
 
-  
+
     case 79:
     if(as3_pass==2) {
 
@@ -3493,7 +3494,7 @@ PASS2
     break;
 
 
-  
+
     case 80:
     if(as3_pass==2) {
 
@@ -3506,7 +3507,7 @@ PASS2
     break;
 
 
-  
+
     case 81:
     if(as3_pass==2) {
 
@@ -3519,7 +3520,7 @@ PASS2
     break;
 
 
-  
+
     case 82:
     if(as3_pass==2) {
 
@@ -3530,7 +3531,7 @@ PASS2
     break;
 
 
-  
+
     case 83:
     if(as3_pass==2) {
 
@@ -3541,7 +3542,7 @@ PASS2
     break;
 
 
-  
+
     case 84:
     if(as3_pass==2) {
 
@@ -3552,7 +3553,7 @@ PASS2
     break;
 
 
-  
+
     case 85:
     if(as3_pass==2) {
 
@@ -3563,7 +3564,7 @@ PASS2
     break;
 
 
-  
+
     case 86:
     if(as3_pass==2) {
 
@@ -3574,7 +3575,7 @@ PASS2
     break;
 
 
-  
+
     case 87:
     if(as3_pass==2) {
 
@@ -3585,7 +3586,7 @@ PASS2
     break;
 
 
-  
+
     case 88:
     if(as3_pass==2) {
 
@@ -3606,7 +3607,7 @@ PASS2
     break;
 
 
-  
+
     case 89:
     if(as3_pass==2) {
 
@@ -3619,7 +3620,7 @@ PASS2
     break;
 
 
-  
+
     case 90:
     if(as3_pass==2) {
 
@@ -3630,7 +3631,7 @@ PASS2
     break;
 
 
-  
+
     case 91:
     if(as3_pass==2) {
 
@@ -3643,7 +3644,7 @@ PASS2
 
     code_t*out = (yyval.code) = abc_kill((yyval.code), state->switch_var);
     breakjumpsto((yyval.code), (yyvsp[(1) - (8)].id), out);
-    
+
     code_t*c = (yyval.code),*lastblock=0;
     while(c) {
         if(c->opcode == OPCODE_IFNE) {
@@ -3660,7 +3661,7 @@ PASS2
         }
         c=c->prev;
     }
-   
+
     (yyval.code) = var_block((yyval.code), state->vars);
     PASS12 old_state();
 }
@@ -3668,7 +3669,7 @@ PASS2
     break;
 
 
-  
+
     case 92:
     if(as3_pass==2) {
 
@@ -3683,7 +3684,7 @@ PASS2
     break;
 
 
-  
+
     case 93:
     if(as3_pass==2) {
 
@@ -3692,7 +3693,7 @@ PASS2
     {
     namespace_t name_ns = {ACCESS_PACKAGE, ""};
     multiname_t name = {QNAME, &name_ns, 0, (yyvsp[(3) - (9)].id)};
-    
+
     NEW(abc_exception_t, e)
     e->exc_type = sig2mname((yyvsp[(4) - (9)].classinfo));
     e->var_name = multiname_clone(&name);
@@ -3713,7 +3714,7 @@ PASS2
     break;
 
 
-  
+
     case 94:
     if(as3_pass==2) {
 
@@ -3724,7 +3725,7 @@ PASS2
     break;
 
 
-  
+
     case 95:
     if(as3_pass==2) {
 
@@ -3749,7 +3750,7 @@ PASS2
     break;
 
 
-  
+
     case 96:
     if(as3_pass==2) {
 
@@ -3760,7 +3761,7 @@ PASS2
     break;
 
 
-  
+
     case 97:
     if(as3_pass==2) {
 
@@ -3771,7 +3772,7 @@ PASS2
     break;
 
 
-  
+
     case 98:
     if(as3_pass==2) {
 
@@ -3782,7 +3783,7 @@ PASS2
     break;
 
 
-  
+
     case 99:
     if(as3_pass==2) {
 
@@ -3800,7 +3801,7 @@ PASS2
     break;
 
 
-  
+
     case 100:
     if(as3_pass==2) {
 
@@ -3818,7 +3819,7 @@ PASS2
     break;
 
 
-  
+
     case 101:
     if(as3_pass==2) {
 
@@ -3832,7 +3833,7 @@ PASS2
     break;
 
 
-  
+
     case 102:
     if(as3_pass==2) {
 
@@ -3847,11 +3848,11 @@ PASS2
         (yyval.code) = abc_jump((yyval.code), out);
     }
     code_t*end = (yyval.code) = abc_nop((yyval.code));
-  
+
     int tmp;
     if((yyvsp[(6) - (6)].catch_list).finally)
         tmp = alloc_local();
-    
+
     abc_exception_list_t*l = (yyvsp[(6) - (6)].catch_list).l;
     int count=0;
     while(l) {
@@ -3866,7 +3867,7 @@ PASS2
             (yyval.code) = code_append((yyval.code), code_dup(state->method->scope_code));
             (yyval.code) = abc___rethrow__((yyval.code));
         }
-        
+
         e->from = start;
         e->to = end;
 
@@ -3875,9 +3876,9 @@ PASS2
     (yyval.code) = code_append((yyval.code), out);
 
     (yyval.code) = insert_finally((yyval.code), (yyvsp[(6) - (6)].catch_list).finally, tmp);
-        
+
     list_concat(state->method->exceptions, (yyvsp[(6) - (6)].catch_list).l);
-   
+
     (yyval.code) = var_block((yyval.code), state->vars);
     PASS12 old_state();
 }
@@ -3885,7 +3886,7 @@ PASS2
     break;
 
 
-  
+
     case 103:
     if(as3_pass==2) {
 
@@ -3899,7 +3900,7 @@ PASS2
     break;
 
 
-  
+
     case 104:
     if(as3_pass==2) {
 
@@ -3917,7 +3918,7 @@ PASS2
     break;
 
 
-  
+
     case 105:
     if(as3_pass==2) {
 
@@ -3937,7 +3938,7 @@ PASS2
     break;
 
 
-  
+
     case 106:
     if(as3_pass==2) {
 
@@ -3961,7 +3962,7 @@ PASS2
     break;
 
 
-  
+
     case 108:
     if(as3_pass==2) {
 
@@ -3972,7 +3973,7 @@ PASS2
     break;
 
 
-  
+
     case 109:
     if(as3_pass==2) {
 
@@ -3983,7 +3984,7 @@ PASS2
     break;
 
 
-  
+
     case 110:
     if(as3_pass==2) {
 
@@ -3994,7 +3995,7 @@ PASS2
     break;
 
 
-  
+
     case 111:
     if(as3_pass==2) {
 
@@ -4005,7 +4006,7 @@ PASS2
     break;
 
 
-  
+
     case 112:
     if(as3_pass==2) {
 
@@ -4016,7 +4017,7 @@ PASS2
     break;
 
 
-  
+
     case 113:
     if(as3_pass==2) {
 
@@ -4027,7 +4028,7 @@ PASS2
     break;
 
 
-  
+
     case 114:
     if(as3_pass==2) {
 
@@ -4038,7 +4039,7 @@ PASS2
     break;
 
 
-  
+
     case 115:
     if(as3_pass==2) {
 
@@ -4049,7 +4050,7 @@ PASS2
     break;
 
 
-  
+
     case 116:
     if(as3_pass==2) {
 
@@ -4060,7 +4061,7 @@ PASS2
     break;
 
 
-  
+
     case 117:
     if(as3_pass==2) {
 
@@ -4078,7 +4079,7 @@ PASS2
     break;
 
 
-  
+
     case 118:
     if(as3_pass==2) {
 
@@ -4091,7 +4092,7 @@ PASS2
            as3_schedule_class((yyvsp[(2) - (2)].classinfo)->package, (yyvsp[(2) - (2)].classinfo)->name);
        }
        /*if(s && s->kind == INFOTYPE_VAR && TYPE_IS_NAMESPACE(s->type)) {
-	    trie_put(active_namespaces, (unsigned char*)$2->name, 0);
+        trie_put(active_namespaces, (unsigned char*)$2->name, 0);
        }*/
        state_has_imports();
        dict_put(state->imports, (yyvsp[(2) - (2)].classinfo)->name, (yyvsp[(2) - (2)].classinfo));
@@ -4102,7 +4103,7 @@ PASS2
     break;
 
 
-  
+
     case 119:
     if(as3_pass==2) {
 
@@ -4125,7 +4126,7 @@ PASS2
     break;
 
 
-  
+
     case 120:
     if(as3_pass==2) {
 
@@ -4136,7 +4137,7 @@ PASS2
     break;
 
 
-  
+
     case 121:
     if(as3_pass==2) {
 
@@ -4147,7 +4148,7 @@ PASS2
     break;
 
 
-  
+
     case 122:
     if(as3_pass==2) {
 
@@ -4158,14 +4159,14 @@ PASS2
     break;
 
 
-  
+
     case 123:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 916 "parser.y"
     {
-    PASS12 
+    PASS12
     (yyval.flags).flags=(yyvsp[(1) - (2)].flags).flags|(yyvsp[(2) - (2)].flags).flags;
     if((yyvsp[(1) - (2)].flags).ns && (yyvsp[(2) - (2)].flags).ns) syntaxerror("only one namespace allowed in one declaration");
     (yyval.flags).ns=(yyvsp[(1) - (2)].flags).ns?(yyvsp[(1) - (2)].flags).ns:(yyvsp[(2) - (2)].flags).ns;
@@ -4175,7 +4176,7 @@ PASS2
     break;
 
 
-  
+
     case 124:
     if(as3_pass==2) {
 
@@ -4186,7 +4187,7 @@ PASS2
     break;
 
 
-  
+
     case 125:
     if(as3_pass==2) {
 
@@ -4197,7 +4198,7 @@ PASS2
     break;
 
 
-  
+
     case 126:
     if(as3_pass==2) {
 
@@ -4208,7 +4209,7 @@ PASS2
     break;
 
 
-  
+
     case 127:
     if(as3_pass==2) {
 
@@ -4219,7 +4220,7 @@ PASS2
     break;
 
 
-  
+
     case 128:
     if(as3_pass==2) {
 
@@ -4230,7 +4231,7 @@ PASS2
     break;
 
 
-  
+
     case 129:
     if(as3_pass==2) {
 
@@ -4241,7 +4242,7 @@ PASS2
     break;
 
 
-  
+
     case 130:
     if(as3_pass==2) {
 
@@ -4252,7 +4253,7 @@ PASS2
     break;
 
 
-  
+
     case 131:
     if(as3_pass==2) {
 
@@ -4263,7 +4264,7 @@ PASS2
     break;
 
 
-  
+
     case 132:
     if(as3_pass==2) {
 
@@ -4274,7 +4275,7 @@ PASS2
     break;
 
 
-  
+
     case 133:
     if(as3_pass==2) {
 
@@ -4285,7 +4286,7 @@ PASS2
     break;
 
 
-  
+
     case 134:
     if(as3_pass==2) {
 
@@ -4296,7 +4297,7 @@ PASS2
     break;
 
 
-  
+
     case 135:
     if(as3_pass==2) {
 
@@ -4307,7 +4308,7 @@ PASS2
     break;
 
 
-  
+
     case 136:
     if(as3_pass==2) {
 
@@ -4318,7 +4319,7 @@ PASS2
     break;
 
 
-  
+
     case 137:
     if(as3_pass==2) {
 
@@ -4329,7 +4330,7 @@ PASS2
     break;
 
 
-  
+
     case 138:
     if(as3_pass==2) {
 
@@ -4340,7 +4341,7 @@ PASS2
     break;
 
 
-  
+
     case 139:
     if(as3_pass==2) {
 
@@ -4351,7 +4352,7 @@ PASS2
     break;
 
 
-  
+
     case 140:
     if(as3_pass==2) {
 
@@ -4362,7 +4363,7 @@ PASS2
     break;
 
 
-  
+
     case 141:
     if(as3_pass==2) {
 
@@ -4374,7 +4375,7 @@ PASS2
     break;
 
 
-  
+
     case 142:
     if(as3_pass==2) {
 
@@ -4385,7 +4386,7 @@ PASS2
     break;
 
 
-  
+
     case 150:
     if(as3_pass==2) {
 
@@ -4396,7 +4397,7 @@ PASS2
     break;
 
 
-  
+
     case 151:
     if(as3_pass==2) {
 
@@ -4404,14 +4405,14 @@ PASS2
 #line 972 "parser.y"
     {
     code_t*c = state->cls->static_init->header;
-    c = code_append(c, (yyvsp[(1) - (1)].code));  
+    c = code_append(c, (yyvsp[(1) - (1)].code));
     state->cls->static_init->header = c;
 }
     }
     break;
 
 
-  
+
     case 157:
     if(as3_pass==2) {
 
@@ -4424,7 +4425,7 @@ PASS2
     break;
 
 
-  
+
     case 158:
     if(as3_pass==2) {
 
@@ -4444,7 +4445,7 @@ PASS2
     break;
 
 
-  
+
     case 161:
     if(as3_pass==2) {
 
@@ -4455,7 +4456,7 @@ PASS2
     break;
 
 
-  
+
     case 162:
     if(as3_pass==2) {
 
@@ -4466,7 +4467,7 @@ PASS2
     break;
 
 
-  
+
     case 163:
     if(as3_pass==2) {
 
@@ -4477,7 +4478,7 @@ PASS2
     break;
 
 
-  
+
     case 164:
     if(as3_pass==2) {
 
@@ -4488,7 +4489,7 @@ PASS2
     break;
 
 
-  
+
     case 165:
     if(as3_pass==2) {
 
@@ -4521,7 +4522,7 @@ PASS12
 
         info->type = (yyvsp[(2) - (3)].classinfo);
         info->flags = flags;
-        
+
         dict_put(global->token2info, (void*)(ptroff_t)as3_tokencount, info);
     }
 
@@ -4537,12 +4538,12 @@ PASS12
             t->type_name = multiname_clone(&m);
         }
         info->slot = t->slot_id;
-        
-        /* workaround for "VerifyError: Error #1053: Illegal override of ::test2 in C1" 
+
+        /* workaround for "VerifyError: Error #1053: Illegal override of ::test2 in C1"
            FIXME: is there a way to use slots and still don't have conflicting overrides?
         */
         info->slot = t->slot_id = 0;
-       
+
         constant_t cval = (yyvsp[(3) - (3)].node)->type->eval((yyvsp[(3) - (3)].node));
         if(cval.type!=CONSTANT_UNKNOWN) {
             /* compile time constant */
@@ -4578,7 +4579,7 @@ PASS12
     break;
 
 
-  
+
     case 166:
     if(as3_pass==2) {
 
@@ -4589,7 +4590,7 @@ PASS12
     break;
 
 
-  
+
     case 167:
     if(as3_pass==2) {
 
@@ -4606,7 +4607,7 @@ PASS12
     break;
 
 
-  
+
     case 168:
     if(as3_pass==2) {
 
@@ -4617,7 +4618,7 @@ PASS12
     break;
 
 
-  
+
     case 169:
     if(as3_pass==2) {
 
@@ -4630,7 +4631,7 @@ PASS12
     break;
 
 
-  
+
     case 170:
     if(as3_pass==2) {
 
@@ -4641,7 +4642,7 @@ PASS12
     break;
 
 
-  
+
     case 171:
     if(as3_pass==2) {
 
@@ -4652,7 +4653,7 @@ PASS12
     break;
 
 
-  
+
     case 172:
     if(as3_pass==2) {
 
@@ -4663,7 +4664,7 @@ PASS12
     break;
 
 
-  
+
     case 173:
     if(as3_pass==2) {
 
@@ -4674,7 +4675,7 @@ PASS12
     break;
 
 
-  
+
     case 174:
     if(as3_pass==2) {
 
@@ -4685,7 +4686,7 @@ PASS12
     break;
 
 
-  
+
     case 175:
     if(as3_pass==2) {
 
@@ -4696,18 +4697,18 @@ PASS12
     break;
 
 
-  
+
     case 176:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 1169 "parser.y"
-    {(yyval.constant) = constant_new_float(__builtin_nan(""));}
+    {(yyval.constant) = constant_new_float(NAN);}
     }
     break;
 
 
-  
+
     case 177:
     if(as3_pass==2) {
 
@@ -4727,7 +4728,7 @@ PASS12
     break;
 
 
-  
+
     case 178:
     if(as3_pass==2) {
 
@@ -4738,7 +4739,7 @@ PASS12
     break;
 
 
-  
+
     case 179:
     if(as3_pass==2) {
 
@@ -4749,7 +4750,7 @@ PASS12
     break;
 
 
-  
+
     case 180:
     if(as3_pass==2) {
 
@@ -4760,7 +4761,7 @@ PASS12
     break;
 
 
-  
+
     case 181:
     if(as3_pass==2) {
 
@@ -4771,7 +4772,7 @@ PASS12
     break;
 
 
-  
+
     case 182:
     if(as3_pass==2) {
 
@@ -4784,7 +4785,7 @@ PASS12
     break;
 
 
-  
+
     case 183:
     if(as3_pass==2) {
 
@@ -4795,7 +4796,7 @@ PASS12
     break;
 
 
-  
+
     case 184:
     if(as3_pass==2) {
 
@@ -4808,7 +4809,7 @@ PASS12
     break;
 
 
-  
+
     case 185:
     if(as3_pass==2) {
 
@@ -4819,7 +4820,7 @@ PASS12
     break;
 
 
-  
+
     case 186:
     if(as3_pass==2) {
 
@@ -4832,7 +4833,7 @@ PASS12
     break;
 
 
-  
+
     case 187:
     if(as3_pass==2) {
 
@@ -4847,7 +4848,7 @@ PASS12
     break;
 
 
-  
+
     case 188:
     if(as3_pass==2) {
 
@@ -4860,7 +4861,7 @@ PASS12
     break;
 
 
-  
+
     case 189:
     if(as3_pass==2) {
 
@@ -4873,7 +4874,7 @@ PASS12
     break;
 
 
-  
+
     case 190:
     if(as3_pass==2) {
 
@@ -4886,7 +4887,7 @@ PASS12
     break;
 
 
-  
+
     case 191:
     if(as3_pass==2) {
 
@@ -4899,7 +4900,7 @@ PASS12
     break;
 
 
-  
+
     case 192:
     if(as3_pass==2) {
 
@@ -4912,7 +4913,7 @@ PASS12
     break;
 
 
-  
+
     case 193:
     if(as3_pass==2) {
 
@@ -4925,7 +4926,7 @@ PASS12
     break;
 
 
-  
+
     case 194:
     if(as3_pass==2) {
 
@@ -4938,7 +4939,7 @@ PASS12
     break;
 
 
-  
+
     case 195:
     if(as3_pass==2) {
 
@@ -4952,7 +4953,7 @@ PASS12
     break;
 
 
-  
+
     case 196:
     if(as3_pass==2) {
 
@@ -4967,7 +4968,7 @@ PASS12
     break;
 
 
-  
+
     case 197:
     if(as3_pass==2) {
 
@@ -4982,7 +4983,7 @@ PASS12
     break;
 
 
-  
+
     case 198:
     if(as3_pass==2) {
 
@@ -4995,7 +4996,7 @@ PASS12
     break;
 
 
-  
+
     case 199:
     if(as3_pass==2) {
 
@@ -5008,7 +5009,7 @@ PASS12
     break;
 
 
-  
+
     case 200:
     if(as3_pass==2) {
 
@@ -5021,7 +5022,7 @@ PASS12
     break;
 
 
-  
+
     case 201:
     if(as3_pass==2) {
 
@@ -5036,7 +5037,7 @@ PASS12
     break;
 
 
-  
+
     case 202:
     if(as3_pass==2) {
 
@@ -5049,7 +5050,7 @@ PASS12
     break;
 
 
-  
+
     case 203:
     if(as3_pass==2) {
 
@@ -5062,7 +5063,7 @@ PASS12
     break;
 
 
-  
+
     case 204:
     if(as3_pass==2) {
 
@@ -5078,7 +5079,7 @@ PASS12
     break;
 
 
-  
+
     case 205:
     if(as3_pass==2) {
 
@@ -5092,7 +5093,7 @@ PASS12
     break;
 
 
-  
+
     case 206:
     if(as3_pass==2) {
 
@@ -5106,7 +5107,7 @@ PASS12
     break;
 
 
-  
+
     case 207:
     if(as3_pass==2) {
 
@@ -5122,7 +5123,7 @@ PASS12
     break;
 
 
-  
+
     case 208:
     if(as3_pass==2) {
 
@@ -5138,7 +5139,7 @@ PASS12
     break;
 
 
-  
+
     case 209:
     if(as3_pass==2) {
 
@@ -5153,7 +5154,7 @@ PASS12
     break;
 
 
-  
+
     case 210:
     if(as3_pass==2) {
 
@@ -5168,7 +5169,7 @@ PASS12
     break;
 
 
-  
+
     case 211:
     if(as3_pass==2) {
 
@@ -5186,7 +5187,7 @@ PASS12
     break;
 
 
-  
+
     case 212:
     if(as3_pass==2) {
 
@@ -5204,7 +5205,7 @@ PASS12
     break;
 
 
-  
+
     case 215:
     if(as3_pass==2) {
 
@@ -5215,7 +5216,7 @@ PASS12
     break;
 
 
-  
+
     case 216:
     if(as3_pass==2) {
 
@@ -5226,18 +5227,18 @@ PASS12
     break;
 
 
-  
+
     case 217:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 1332 "parser.y"
     {
-    PASS1 
+    PASS1
     endfunction(&(yyvsp[(1) - (12)].flags),(yyvsp[(3) - (12)].token),(yyvsp[(4) - (12)].id),&(yyvsp[(6) - (12)].params),0,0);
     PASS2
     if(!state->method->info) syntaxerror("internal error");
-    
+
     code_t*c = method_header(state->method);
     c = wrap_function(c, 0, (yyvsp[(11) - (12)].code));
 
@@ -5250,7 +5251,7 @@ PASS12
     break;
 
 
-  
+
     case 219:
     if(as3_pass==2) {
 
@@ -5261,7 +5262,7 @@ PASS12
     break;
 
 
-  
+
     case 220:
     if(as3_pass==2) {
 
@@ -5272,7 +5273,7 @@ PASS12
     break;
 
 
-  
+
     case 221:
     if(as3_pass==2) {
 
@@ -5284,13 +5285,13 @@ PASS12
     PASS2
     methodinfo_t*f = state->method->info;
     if(!f || !f->kind) syntaxerror("internal error");
-    
+
     code_t*c = method_header(state->method);
     c = wrap_function(c, 0, (yyvsp[(9) - (10)].code));
 
     int index = state->method->var_index;
     endfunction(0,0,(yyvsp[(2) - (10)].id),&(yyvsp[(4) - (10)].params),(yyvsp[(6) - (10)].classinfo),c);
-    
+
     (yyval.value).c = abc_getlocal(0, index);
     (yyval.value).t = TYPE_FUNCTION(f);
 
@@ -5300,7 +5301,7 @@ PASS12
     break;
 
 
-  
+
     case 222:
     if(as3_pass==2) {
 
@@ -5329,7 +5330,7 @@ PASS12
     break;
 
 
-  
+
     case 223:
     if(as3_pass==2) {
 
@@ -5353,7 +5354,7 @@ PASS12
     break;
 
 
-  
+
     case 226:
     if(as3_pass==2) {
 
@@ -5364,7 +5365,7 @@ PASS12
     break;
 
 
-  
+
     case 227:
     if(as3_pass==2) {
 
@@ -5375,7 +5376,7 @@ PASS12
     break;
 
 
-  
+
     case 228:
     if(as3_pass==2) {
 
@@ -5386,7 +5387,7 @@ PASS12
     break;
 
 
-  
+
     case 229:
     if(as3_pass==2) {
 
@@ -5397,7 +5398,7 @@ PASS12
     break;
 
 
-  
+
     case 230:
     if(as3_pass==2) {
 
@@ -5408,7 +5409,7 @@ PASS12
     break;
 
 
-  
+
     case 231:
     if(as3_pass==2) {
 
@@ -5419,7 +5420,7 @@ PASS12
     break;
 
 
-  
+
     case 232:
     if(as3_pass==2) {
 
@@ -5430,7 +5431,7 @@ PASS12
     break;
 
 
-  
+
     case 233:
     if(as3_pass==2) {
 
@@ -5441,7 +5442,7 @@ PASS12
     break;
 
 
-  
+
     case 234:
     if(as3_pass==2) {
 
@@ -5452,7 +5453,7 @@ PASS12
     break;
 
 
-  
+
     case 235:
     if(as3_pass==2) {
 
@@ -5463,7 +5464,7 @@ PASS12
     break;
 
 
-  
+
     case 238:
     if(as3_pass==2) {
 
@@ -5476,7 +5477,7 @@ PASS12
     break;
 
 
-  
+
     case 239:
     if(as3_pass==2) {
 
@@ -5487,7 +5488,7 @@ PASS12
     break;
 
 
-  
+
     case 240:
     if(as3_pass==2) {
 
@@ -5501,7 +5502,7 @@ PASS12
     break;
 
 
-  
+
     case 242:
     if(as3_pass==2) {
 
@@ -5511,7 +5512,7 @@ PASS12
     typedcode_t v = node_read((yyvsp[(2) - (4)].node));
     (yyval.value).c = v.c;
     if((yyval.value).c->opcode == OPCODE_COERCE_A) (yyval.value).c = code_cutlast((yyval.value).c);
-    
+
     code_t*paramcode = (yyvsp[(4) - (4)].value_list).cc;
     if((yyval.value).c->opcode == OPCODE_GETPROPERTY) {
         multiname_t*name = (yyval.value).c->data[0];(yyval.value).c->data[0]=0;
@@ -5540,7 +5541,7 @@ PASS12
         (yyval.value).c = code_append((yyval.value).c, paramcode);
         (yyval.value).c = abc_construct((yyval.value).c, (yyvsp[(4) - (4)].value_list).number);
     }
-   
+
     (yyval.value).t = TYPE_ANY;
     if(TYPE_IS_CLASS(v.t) && v.t->data) {
         (yyval.value).t = v.t->data;
@@ -5553,14 +5554,14 @@ PASS12
     break;
 
 
-  
+
     case 243:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 1495 "parser.y"
     {
-   
+
     typedcode_t v = node_read((yyvsp[(1) - (4)].node));
     (yyval.value).c = v.c;
     if((yyval.value).c->opcode == OPCODE_COERCE_A) {
@@ -5597,7 +5598,7 @@ PASS12
         (yyval.value).c = code_append((yyval.value).c, paramcode);
         (yyval.value).c = abc_call((yyval.value).c, (yyvsp[(3) - (4)].value_list).number);
     }
-   
+
     if(TYPE_IS_FUNCTION(v.t) && v.t->data) {
         (yyval.value).t = ((methodinfo_t*)(v.t->data))->return_type;
     } else if(TYPE_IS_CLASS(v.t) && v.t->data) {
@@ -5612,7 +5613,7 @@ PASS12
     break;
 
 
-  
+
     case 244:
     if(as3_pass==2) {
 
@@ -5642,7 +5643,7 @@ PASS12
     break;
 
 
-  
+
     case 245:
     if(as3_pass==2) {
 
@@ -5673,7 +5674,7 @@ PASS12
     break;
 
 
-  
+
     case 246:
     if(as3_pass==2) {
 
@@ -5686,7 +5687,7 @@ PASS12
     break;
 
 
-  
+
     case 247:
     if(as3_pass==2) {
 
@@ -5700,7 +5701,7 @@ PASS12
     break;
 
 
-  
+
     case 248:
     if(as3_pass==2) {
 
@@ -5713,7 +5714,7 @@ PASS12
     break;
 
 
-  
+
     case 249:
     if(as3_pass==2) {
 
@@ -5726,7 +5727,7 @@ PASS12
     break;
 
 
-  
+
     case 250:
     if(as3_pass==2) {
 
@@ -5739,7 +5740,7 @@ PASS12
     break;
 
 
-  
+
     case 251:
     if(as3_pass==2) {
 
@@ -5752,34 +5753,34 @@ PASS12
     break;
 
 
-  
+
     case 252:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 1610 "parser.y"
-    { 
-    (yyval.code) = node_exec((yyvsp[(1) - (1)].node)); 
+    {
+    (yyval.code) = node_exec((yyvsp[(1) - (1)].node));
 }
     }
     break;
 
 
-  
+
     case 253:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 1613 "parser.y"
-    { 
+    {
     (yyval.code) = (yyvsp[(1) - (3)].code);
-    (yyval.code) = code_append((yyval.code), node_exec((yyvsp[(3) - (3)].node))); 
+    (yyval.code) = code_append((yyval.code), node_exec((yyvsp[(3) - (3)].node)));
 }
     }
     break;
 
 
-  
+
     case 254:
     if(as3_pass==2) {
 
@@ -5790,7 +5791,7 @@ PASS12
     break;
 
 
-  
+
     case 255:
     if(as3_pass==2) {
 
@@ -5801,7 +5802,7 @@ PASS12
     break;
 
 
-  
+
     case 256:
     if(as3_pass==2) {
 
@@ -5812,7 +5813,7 @@ PASS12
     break;
 
 
-  
+
     case 257:
     if(as3_pass==2) {
 
@@ -5823,7 +5824,7 @@ PASS12
     break;
 
 
-  
+
     case 258:
     if(as3_pass==2) {
 
@@ -5834,7 +5835,7 @@ PASS12
     break;
 
 
-  
+
     case 259:
     if(as3_pass==2) {
 
@@ -5845,7 +5846,7 @@ PASS12
     break;
 
 
-  
+
     case 260:
     if(as3_pass==2) {
 
@@ -5856,7 +5857,7 @@ PASS12
     break;
 
 
-  
+
     case 261:
     if(as3_pass==2) {
 
@@ -5872,7 +5873,7 @@ PASS12
     break;
 
 
-  
+
     case 262:
     if(as3_pass==2) {
 
@@ -5888,7 +5889,7 @@ PASS12
     break;
 
 
-  
+
     case 263:
     if(as3_pass==2) {
 
@@ -5899,7 +5900,7 @@ PASS12
     break;
 
 
-  
+
     case 264:
     if(as3_pass==2) {
 
@@ -5910,7 +5911,7 @@ PASS12
     break;
 
 
-  
+
     case 265:
     if(as3_pass==2) {
 
@@ -5921,7 +5922,7 @@ PASS12
     break;
 
 
-  
+
     case 266:
     if(as3_pass==2) {
 
@@ -5932,7 +5933,7 @@ PASS12
     break;
 
 
-  
+
     case 267:
     if(as3_pass==2) {
 
@@ -5943,7 +5944,7 @@ PASS12
     break;
 
 
-  
+
     case 268:
     if(as3_pass==2) {
 
@@ -5954,20 +5955,20 @@ PASS12
     break;
 
 
-  
+
     case 269:
     if(as3_pass==2) {
 
 /* Line 1464 of skeleton.m4  */
 #line 1649 "parser.y"
-    { 
+    {
     (yyval.node) = mkconstnode((yyvsp[(1) - (1)].constant));
 }
     }
     break;
 
 
-  
+
     case 270:
     if(as3_pass==2) {
 
@@ -5980,7 +5981,7 @@ PASS12
     break;
 
 
-  
+
     case 271:
     if(as3_pass==2) {
 
@@ -6007,7 +6008,7 @@ PASS12
     break;
 
 
-  
+
     case 272:
     if(as3_pass==2) {
 
@@ -6026,7 +6027,7 @@ PASS12
     break;
 
 
-  
+
     case 273:
     if(as3_pass==2) {
 
@@ -6044,7 +6045,7 @@ PASS12
     break;
 
 
-  
+
     case 274:
     if(as3_pass==2) {
 
@@ -6062,7 +6063,7 @@ PASS12
     break;
 
 
-  
+
     case 275:
     if(as3_pass==2) {
 
@@ -6073,7 +6074,7 @@ PASS12
     break;
 
 
-  
+
     case 276:
     if(as3_pass==2) {
 
@@ -6084,7 +6085,7 @@ PASS12
     break;
 
 
-  
+
     case 277:
     if(as3_pass==2) {
 
@@ -6095,7 +6096,7 @@ PASS12
     break;
 
 
-  
+
     case 278:
     if(as3_pass==2) {
 
@@ -6106,7 +6107,7 @@ PASS12
     break;
 
 
-  
+
     case 279:
     if(as3_pass==2) {
 
@@ -6117,7 +6118,7 @@ PASS12
     break;
 
 
-  
+
     case 280:
     if(as3_pass==2) {
 
@@ -6128,7 +6129,7 @@ PASS12
     break;
 
 
-  
+
     case 281:
     if(as3_pass==2) {
 
@@ -6139,7 +6140,7 @@ PASS12
     break;
 
 
-  
+
     case 282:
     if(as3_pass==2) {
 
@@ -6150,7 +6151,7 @@ PASS12
     break;
 
 
-  
+
     case 283:
     if(as3_pass==2) {
 
@@ -6161,7 +6162,7 @@ PASS12
     break;
 
 
-  
+
     case 284:
     if(as3_pass==2) {
 
@@ -6172,7 +6173,7 @@ PASS12
     break;
 
 
-  
+
     case 285:
     if(as3_pass==2) {
 
@@ -6183,7 +6184,7 @@ PASS12
     break;
 
 
-  
+
     case 286:
     if(as3_pass==2) {
 
@@ -6194,7 +6195,7 @@ PASS12
     break;
 
 
-  
+
     case 287:
     if(as3_pass==2) {
 
@@ -6205,7 +6206,7 @@ PASS12
     break;
 
 
-  
+
     case 288:
     if(as3_pass==2) {
 
@@ -6216,7 +6217,7 @@ PASS12
     break;
 
 
-  
+
     case 289:
     if(as3_pass==2) {
 
@@ -6227,7 +6228,7 @@ PASS12
     break;
 
 
-  
+
     case 290:
     if(as3_pass==2) {
 
@@ -6238,7 +6239,7 @@ PASS12
     break;
 
 
-  
+
     case 291:
     if(as3_pass==2) {
 
@@ -6249,7 +6250,7 @@ PASS12
     break;
 
 
-  
+
     case 292:
     if(as3_pass==2) {
 
@@ -6260,7 +6261,7 @@ PASS12
     break;
 
 
-  
+
     case 293:
     if(as3_pass==2) {
 
@@ -6271,7 +6272,7 @@ PASS12
     break;
 
 
-  
+
     case 294:
     if(as3_pass==2) {
 
@@ -6282,7 +6283,7 @@ PASS12
     break;
 
 
-  
+
     case 295:
     if(as3_pass==2) {
 
@@ -6293,7 +6294,7 @@ PASS12
     break;
 
 
-  
+
     case 296:
     if(as3_pass==2) {
 
@@ -6304,7 +6305,7 @@ PASS12
     break;
 
 
-  
+
     case 297:
     if(as3_pass==2) {
 
@@ -6315,7 +6316,7 @@ PASS12
     break;
 
 
-  
+
     case 298:
     if(as3_pass==2) {
 
@@ -6326,7 +6327,7 @@ PASS12
     break;
 
 
-  
+
     case 299:
     if(as3_pass==2) {
 
@@ -6337,7 +6338,7 @@ PASS12
     break;
 
 
-  
+
     case 300:
     if(as3_pass==2) {
 
@@ -6348,7 +6349,7 @@ PASS12
     break;
 
 
-  
+
     case 301:
     if(as3_pass==2) {
 
@@ -6359,7 +6360,7 @@ PASS12
     break;
 
 
-  
+
     case 302:
     if(as3_pass==2) {
 
@@ -6370,7 +6371,7 @@ PASS12
     break;
 
 
-  
+
     case 303:
     if(as3_pass==2) {
 
@@ -6381,7 +6382,7 @@ PASS12
     break;
 
 
-  
+
     case 304:
     if(as3_pass==2) {
 
@@ -6392,7 +6393,7 @@ PASS12
     break;
 
 
-  
+
     case 305:
     if(as3_pass==2) {
 
@@ -6403,7 +6404,7 @@ PASS12
     break;
 
 
-  
+
     case 306:
     if(as3_pass==2) {
 
@@ -6414,7 +6415,7 @@ PASS12
     break;
 
 
-  
+
     case 307:
     if(as3_pass==2) {
 
@@ -6425,7 +6426,7 @@ PASS12
     break;
 
 
-  
+
     case 308:
     if(as3_pass==2) {
 
@@ -6436,7 +6437,7 @@ PASS12
     break;
 
 
-  
+
     case 309:
     if(as3_pass==2) {
 
@@ -6447,7 +6448,7 @@ PASS12
     break;
 
 
-  
+
     case 310:
     if(as3_pass==2) {
 
@@ -6458,7 +6459,7 @@ PASS12
     break;
 
 
-  
+
     case 311:
     if(as3_pass==2) {
 
@@ -6469,7 +6470,7 @@ PASS12
     break;
 
 
-  
+
     case 312:
     if(as3_pass==2) {
 
@@ -6480,7 +6481,7 @@ PASS12
     break;
 
 
-  
+
     case 313:
     if(as3_pass==2) {
 
@@ -6491,7 +6492,7 @@ PASS12
     break;
 
 
-  
+
     case 314:
     if(as3_pass==2) {
 
@@ -6502,7 +6503,7 @@ PASS12
     break;
 
 
-  
+
     case 315:
     if(as3_pass==2) {
 
@@ -6513,7 +6514,7 @@ PASS12
     break;
 
 
-  
+
     case 316:
     if(as3_pass==2) {
 
@@ -6524,7 +6525,7 @@ PASS12
     break;
 
 
-  
+
     case 317:
     if(as3_pass==2) {
 
@@ -6535,7 +6536,7 @@ PASS12
     break;
 
 
-  
+
     case 318:
     if(as3_pass==2) {
 
@@ -6546,7 +6547,7 @@ PASS12
     break;
 
 
-  
+
     case 319:
     if(as3_pass==2) {
 
@@ -6557,7 +6558,7 @@ PASS12
     break;
 
 
-  
+
     case 320:
     if(as3_pass==2) {
 
@@ -6568,7 +6569,7 @@ PASS12
     break;
 
 
-  
+
     case 321:
     if(as3_pass==2) {
 
@@ -6579,7 +6580,7 @@ PASS12
     break;
 
 
-  
+
     case 322:
     if(as3_pass==2) {
 
@@ -6590,7 +6591,7 @@ PASS12
     break;
 
 
-  
+
     case 323:
     if(as3_pass==2) {
 
@@ -6601,7 +6602,7 @@ PASS12
     break;
 
 
-  
+
     case 324:
     if(as3_pass==2) {
 
@@ -6612,7 +6613,7 @@ PASS12
     break;
 
 
-  
+
     case 325:
     if(as3_pass==2) {
 
@@ -6635,7 +6636,7 @@ PASS12
     break;
 
 
-  
+
     case 326:
     if(as3_pass==2) {
 
@@ -6652,7 +6653,7 @@ PASS12
     break;
 
 
-  
+
     case 327:
     if(as3_pass==2) {
 
@@ -6663,7 +6664,7 @@ PASS12
     break;
 
 
-  
+
     case 328:
     if(as3_pass==2) {
 
@@ -6679,7 +6680,7 @@ PASS12
     int result = alloc_local();
     int tmp = alloc_local();
     int xml = alloc_local();
-    
+
     c = code_append(c, v.c);
     c = abc_checkfilter(c);
     c = abc_coerce_a(c); //hasnext2 converts to *
@@ -6714,7 +6715,7 @@ PASS12
     c = abc_kill(c, xml);
     c = abc_kill(c, result);
     c = abc_kill(c, index);
-    
+
     c = var_block(c, state->vars);
     old_state();
     typedcode_t r;
@@ -6726,7 +6727,7 @@ PASS12
     break;
 
 
-  
+
     case 329:
     if(as3_pass==2) {
 
@@ -6737,7 +6738,7 @@ PASS12
     break;
 
 
-  
+
     case 331:
     if(as3_pass==2) {
 
@@ -6748,7 +6749,7 @@ PASS12
     break;
 
 
-  
+
     case 332:
     if(as3_pass==2) {
 
@@ -6760,7 +6761,7 @@ PASS12
     break;
 
 
-  
+
     case 333:
     if(as3_pass==2) {
 
@@ -6773,7 +6774,7 @@ PASS12
     break;
 
 
-  
+
     case 334:
     if(as3_pass==2) {
 
@@ -6790,7 +6791,7 @@ PASS12
     break;
 
 
-  
+
     case 335:
     if(as3_pass==2) {
 
@@ -6803,7 +6804,7 @@ PASS12
     break;
 
 
-  
+
     case 336:
     if(as3_pass==2) {
 
@@ -6823,7 +6824,7 @@ PASS12
     break;
 
 
-  
+
     case 337:
     if(as3_pass==2) {
 
@@ -6840,7 +6841,7 @@ PASS12
     break;
 
 
-  
+
     case 338:
     if(as3_pass==2) {
 
@@ -6853,7 +6854,7 @@ PASS12
     break;
 
 
-  
+
     case 339:
     if(as3_pass==2) {
 
@@ -6870,7 +6871,7 @@ PASS12
     break;
 
 
-  
+
     case 340:
     if(as3_pass==2) {
 
@@ -6883,7 +6884,7 @@ PASS12
     break;
 
 
-  
+
     case 341:
     if(as3_pass==2) {
 
@@ -6903,7 +6904,7 @@ PASS12
     break;
 
 
-  
+
     case 342:
     if(as3_pass==2) {
 
@@ -6923,7 +6924,7 @@ PASS12
     break;
 
 
-  
+
     case 343:
     if(as3_pass==2) {
 
@@ -6966,7 +6967,7 @@ PASS12
         (yyval.value).t = slotinfo_gettype((slotinfo_t*)f);
         if(!(yyval.value).t)
            (yyval.value).c = abc_coerce_a((yyval.value).c);
-        
+
     } else if(v1.c && v1.c->opcode == OPCODE___PUSHPACKAGE__) {
         string_t*package = v1.c->data[0];
         char*package2 = concat3(package->str, ".", (yyvsp[(3) - (3)].id));
@@ -6997,7 +6998,7 @@ PASS12
     break;
 
 
-  
+
     case 344:
     if(as3_pass==2) {
 
@@ -7020,7 +7021,7 @@ PASS12
            for this identifier- maybe there's a file $1.as defining $1. */
         as3_schedule_class_noerror(state->package, name);
     }
-   
+
     (yyval.node) = 0;
     PASS2
     char*name = (yyvsp[(1) - (1)].id);
@@ -7030,7 +7031,7 @@ PASS12
     break;
 
 
-  
+
     case 345:
     if(as3_pass==2) {
 
@@ -7047,7 +7048,7 @@ PASS12
     break;
 
 
-  
+
     case 346:
     if(as3_pass==2) {
 
@@ -7064,7 +7065,7 @@ PASS12
     break;
 
 
-  
+
     case 347:
     if(as3_pass==2) {
 
@@ -7081,7 +7082,7 @@ PASS12
     break;
 
 
-  
+
     case 348:
     if(as3_pass==2) {
 
@@ -7098,7 +7099,7 @@ PASS12
     ns.access = ACCESS_NAMESPACE;
     ns.name = (yyvsp[(2) - (2)].namespace_decl)->url;
     var->value = constant_new_namespace(&ns);
-      
+
     if(as3_pass==2) {
         MULTINAME(m, TYPE_NAMESPACE);
         trait_t*t = add_abc_slot(&(yyvsp[(1) - (2)].flags), (yyvsp[(2) - (2)].namespace_decl)->name, 0, 0);
@@ -7112,7 +7113,7 @@ PASS12
     break;
 
 
-  
+
     case 349:
     if(as3_pass==2) {
 
@@ -7127,7 +7128,7 @@ PASS12
     break;
 
 
-  
+
     case 350:
     if(as3_pass==2) {
 
@@ -7197,60 +7198,60 @@ yyerrlab:
 #if ! YYERROR_VERBOSE
       yyerror (YY_("syntax error"));
 #else
-      {
+	  {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
 	if (yymsg_alloc < yysize && yymsg_alloc < YYSTACK_ALLOC_MAXIMUM)
 	  {
-	    YYSIZE_T yyalloc = 2 * yysize;
-	    if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
-	      yyalloc = YYSTACK_ALLOC_MAXIMUM;
-	    if (yymsg != yymsgbuf)
-	      YYSTACK_FREE (yymsg);
-	    yymsg = (char *) YYSTACK_ALLOC (yyalloc);
-	    if (yymsg)
-	      yymsg_alloc = yyalloc;
-	    else
-	      {
+		YYSIZE_T yyalloc = 2 * yysize;
+		if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
+		  yyalloc = YYSTACK_ALLOC_MAXIMUM;
+		if (yymsg != yymsgbuf)
+		  YYSTACK_FREE (yymsg);
+		yymsg = (char *) YYSTACK_ALLOC (yyalloc);
+		if (yymsg)
+		  yymsg_alloc = yyalloc;
+		else
+		  {
 		yymsg = yymsgbuf;
 		yymsg_alloc = sizeof yymsgbuf;
-	      }
+		  }
 	  }
 
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
-	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yymsg);
+		(void) yysyntax_error (yymsg, yystate, yychar);
+		yyerror (yymsg);
 	  }
 	else
 	  {
-	    yyerror (YY_("syntax error"));
-	    if (yysize != 0)
-	      goto yyexhaustedlab;
+		yyerror (YY_("syntax error"));
+		if (yysize != 0)
+		  goto yyexhaustedlab;
 	  }
-      }
+	  }
 #endif
-    }
+	}
 
 
 
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
-	 error, discard it.  */
+     error, discard it.  */
 
-      if (yychar <= YYEOF)
+	  if (yychar <= YYEOF)
 	{
 	  /* Return failure if at end of input.  */
 	  if (yychar == YYEOF)
-	    YYABORT;
+		YYABORT;
 	}
-      else
+	  else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
+			  yytoken, &yylval);
 	  yychar = YYEMPTY;
 	}
-    }
+	}
 
   /* Else will try to reuse lookahead token after shifting the error
      token.  */
@@ -7287,27 +7288,27 @@ yyerrlab1:
     {
       yyn = yypact[yystate];
       if (yyn != YYPACT_NINF)
-	{
-	  yyn += YYTERROR;
-	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-	    {
-	      yyn = yytable[yyn];
-	      if (0 < yyn)
-		break;
-	    }
-	}
+    {
+      yyn += YYTERROR;
+      if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+        {
+          yyn = yytable[yyn];
+          if (0 < yyn)
+        break;
+        }
+    }
 
       /* Pop the current state because it cannot handle the error token.  */
       if (yyssp == yyss)
-	YYABORT;
+    YYABORT;
 
 
-      yydestruct ("Error: popping",
+	  yydestruct ("Error: popping",
 		  yystos[yystate], yyvsp);
-      YYPOPSTACK (1);
-      yystate = *yyssp;
-      YY_STACK_PRINT (yyss, yyssp);
-    }
+	  YYPOPSTACK (1);
+	  yystate = *yyssp;
+	  YY_STACK_PRINT (yyss, yyssp);
+	}
 
   *++yyvsp = yylval;
 
@@ -7346,7 +7347,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval);
+         yytoken, &yylval);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -7354,7 +7355,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp);
+          yystos[*yyssp], yyvsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow

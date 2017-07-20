@@ -3,8 +3,8 @@
 edgestyle_t edgestyle_default;
 
 windstate_t windstate_nonfilled = {
-    is_filled: 0,
-    wind_nr: 0,
+    0,
+    0,
 };
 
 // -------------------- even/odd ----------------------
@@ -28,9 +28,9 @@ edgestyle_t* evenodd_diff(windstate_t*left, windstate_t*right)
 }
 
 windrule_t windrule_evenodd = {
-    start: evenodd_start,
-    add: evenodd_add,
-    diff: evenodd_diff,
+    evenodd_start,
+    evenodd_add,
+    evenodd_diff,
 };
 
 // -------------------- circular ----------------------
@@ -45,9 +45,9 @@ windstate_t circular_add(windcontext_t*context, windstate_t left, edgestyle_t*ed
     assert(edge);
     /* which one is + and which one - doesn't actually make any difference */
     if(dir == DIR_DOWN)
-	left.wind_nr++;
+    left.wind_nr++;
     else
-	left.wind_nr--;
+    left.wind_nr--;
 
     left.is_filled = left.wind_nr != 0;
     return left;
@@ -62,9 +62,9 @@ edgestyle_t* circular_diff(windstate_t*left, windstate_t*right)
 }
 
 windrule_t windrule_circular = {
-    start: circular_start,
-    add: circular_add,
-    diff: circular_diff,
+    circular_start,
+    circular_add,
+    circular_diff,
 };
 
 // -------------------- intersect ----------------------
@@ -92,9 +92,9 @@ edgestyle_t* intersect_diff(windstate_t*left, windstate_t*right)
 }
 
 windrule_t windrule_intersect = {
-    start: intersect_start,
-    add: intersect_add,
-    diff: intersect_diff,
+    intersect_start,
+    intersect_add,
+    intersect_diff,
 };
 
 // -------------------- union ----------------------
@@ -121,13 +121,13 @@ edgestyle_t* union_diff(windstate_t*left, windstate_t*right)
 }
 
 windrule_t windrule_union = {
-    start: union_start,
-    add: union_add,
-    diff: union_diff,
+    union_start,
+    union_add,
+    union_diff,
 };
 
 
-/* 
+/*
  } else if (rule == WIND_NONZERO) {
      fill = wind!=0;
  } else if (rule == WIND_ODDEVEN) {

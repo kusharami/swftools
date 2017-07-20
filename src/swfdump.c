@@ -2,9 +2,9 @@
    Shows the structure of a swf file
 
    Part of the swftools package.
-   
+
    Copyright (c) 2001 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -33,7 +33,9 @@
 #undef HAVE_STAT
 #endif
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdarg.h>
@@ -44,7 +46,7 @@
 static char * filename = 0;
 
 /* idtab stores the ids which are defined in the file. This allows us
-   to detect errors in the file. (i.e. ids which are defined more than 
+   to detect errors in the file. (i.e. ids which are defined more than
    once */
 static char idtab[65536];
 static char * indent = "                ";
@@ -90,7 +92,7 @@ int args_callback_option(char*name,char*val)
     if(!strcmp(name, "V")) {
         printf("swfdump - part of %s %s\n", PACKAGE, VERSION);
         exit(0);
-    } 
+    }
     else if(name[0]=='a') {
         action = 1;
         return 0;
@@ -121,48 +123,48 @@ int args_callback_option(char*name,char*val)
         return 0;
     }
     else if(name[0]=='X') {
-	xy |= 1;
-	return 0;
+    xy |= 1;
+    return 0;
     }
     else if(name[0]=='Y') {
-	xy |= 2;
-	return 0;
+    xy |= 2;
+    return 0;
     }
     else if(name[0]=='r') {
-	xy |= 4;
-	return 0;
+    xy |= 4;
+    return 0;
     }
     else if(name[0]=='f') {
-	xy |= 8;
-	return 0;
+    xy |= 8;
+    return 0;
     }
     else if(name[0]=='F') {
-	showfonts = 1;
-	return 0;
+    showfonts = 1;
+    return 0;
     }
     else if(name[0]=='d') {
-	hex = 1;
-	return 0;
+    hex = 1;
+    return 0;
     }
     else if(name[0]=='u') {
-	used = 1;
-	return 0;
+    used = 1;
+    return 0;
     }
     else if(name[0]=='b') {
-	bbox = 1;
-	return 0;
+    bbox = 1;
+    return 0;
     }
     else if(name[0]=='B') {
-	showbuttons = 1;
-	return 0;
+    showbuttons = 1;
+    return 0;
     }
     else if(name[0]=='D') {
-	showbuttons = action = placements = showtext = showshapes = 1;
-	return 0;
+    showbuttons = action = placements = showtext = showshapes = 1;
+    return 0;
     }
     else {
         printf("Unknown option: -%s\n", name);
-	exit(1);
+    exit(1);
     }
 
     return 0;
@@ -222,7 +224,7 @@ void dumpButton2Actions(TAG*tag, char*prefix)
     oldTagPos = swf_GetTagPos(tag);
 
     // scan DefineButton2 Record
-    
+
     swf_GetU16(tag);          // Character ID
     swf_GetU8(tag);           // Flags;
 
@@ -240,17 +242,17 @@ void dumpButton2Actions(TAG*tag, char*prefix)
     { U8 a;
       ActionTAG*actions;
 
-      if(tag->pos >= tag->len)
+	  if(tag->pos >= tag->len)
 	  break;
-        
+
       offsetpos = swf_GetU16(tag);
       condition = swf_GetU16(tag);                // condition
-      
+
       actions = swf_ActionGet(tag);
       printf("%s condition %04x\n", prefix, condition);
       swf_DumpActions(actions, prefix);
     }
-    
+
     swf_SetTagPos(tag,oldTagPos);
     return;
 }
@@ -281,7 +283,7 @@ void dumpButton(TAG*tag, char*prefix)
         U16 id = swf_GetU16(tag);
         U16 depth = swf_GetU16(tag);
         char event[80];
-        sprintf(event, "%s%s%s%s", 
+        sprintf(event, "%s%s%s%s",
                 (flags&BS_HIT)?"[hit]":"",
                 (flags&BS_DOWN)?"[down]":"",
                 (flags&BS_OVER)?"[over]":"",
@@ -300,11 +302,11 @@ void dumpFont(TAG*tag, char*prefix)
     SWFFONT* font = malloc(sizeof(SWFFONT));
     memset(font, 0, sizeof(SWFFONT));
     if(tag->id == ST_DEFINEFONT2 || tag->id == ST_DEFINEFONT3) {
-	swf_FontExtract_DefineFont2(0, font, tag);
+    swf_FontExtract_DefineFont2(0, font, tag);
     } else if(tag->id == ST_DEFINEFONT) {
-	swf_FontExtract_DefineFont(0, font, tag);
+    swf_FontExtract_DefineFont(0, font, tag);
     } else {
-	printf("%sCan't parse %s yet\n", prefix,swf_TagGetName(tag));
+    printf("%sCan't parse %s yet\n", prefix,swf_TagGetName(tag));
     }
     printf("%sID: %d\n", prefix,font->id);
     printf("%sVersion: %d\n", prefix,font->version);
@@ -313,41 +315,41 @@ void dumpFont(TAG*tag, char*prefix)
     printf("%shightest mapped unicode value: %d\n", prefix,font->maxascii);
     if(font->layout)
     {
-	printf("%sascent:%.2f\n", prefix,font->layout->ascent / 20.0);
-	printf("%sdescent:%.2f\n", prefix,font->layout->descent / 20.0);
-	printf("%sleading:%.2f\n", prefix,font->layout->leading / 20.0);
-	printf("%skerning records:%d\n", prefix,font->layout->kerningcount);
+    printf("%sascent:%.2f\n", prefix,font->layout->ascent / 20.0);
+    printf("%sdescent:%.2f\n", prefix,font->layout->descent / 20.0);
+    printf("%sleading:%.2f\n", prefix,font->layout->leading / 20.0);
+    printf("%skerning records:%d\n", prefix,font->layout->kerningcount);
     }
     printf("%sstyle: %d\n", prefix,font->style);
     printf("%sencoding: %02x\n", prefix,font->encoding);
     printf("%slanguage: %02x\n", prefix,font->language);
     int t;
     for(t=0;t<font->numchars;t++) {
-	int u = font->glyph2ascii?font->glyph2ascii[t]:-1;
-	char ustr[16];
-	if(u>=32) sprintf(ustr, " '%c'", u);
-	else      sprintf(ustr, " 0x%02x", u);
-	printf("%s== Glyph %d: advance=%d encoding=%d%s ==\n", prefix, t, font->glyph[t].advance, u, ustr);
-	SHAPE2* shape = swf_ShapeToShape2(font->glyph[t].shape);
-	SHAPELINE*line = shape->lines;
+    int u = font->glyph2ascii?font->glyph2ascii[t]:-1;
+    char ustr[16];
+    if(u>=32) sprintf(ustr, " '%c'", u);
+    else      sprintf(ustr, " 0x%02x", u);
+    printf("%s== Glyph %d: advance=%d encoding=%d%s ==\n", prefix, t, font->glyph[t].advance, u, ustr);
+    SHAPE2* shape = swf_ShapeToShape2(font->glyph[t].shape);
+    SHAPELINE*line = shape->lines;
 
 	while(line) {
-	    if(line->type == moveTo) {
+		if(line->type == moveTo) {
 		printf("%smoveTo %.2f %.2f\n", prefix, line->x/20.0, line->y/20.0);
-	    } else if(line->type == lineTo) {
+		} else if(line->type == lineTo) {
 		printf("%slineTo %.2f %.2f\n", prefix, line->x/20.0, line->y/20.0);
-	    } else if(line->type == splineTo) {
+		} else if(line->type == splineTo) {
 		printf("%ssplineTo (%.2f %.2f) %.2f %.2f\n", prefix,
 			line->sx/20.0, line->sy/20.0,
 			line->x/20.0, line->y/20.0
 			);
-	    }
-	    line = line->next;
+		}
+		line = line->next;
 	}
 	swf_Shape2Free(shape);
 	free(shape);
-    }
-    
+	}
+
     /*
       not part of the file
 
@@ -383,47 +385,47 @@ static SWF swf;
 static int fontnum = 0;
 static SWFFONT**fonts;
 
-void textcallback(void*self, int*glyphs, int*xpos, int nr, int fontid, int fontsize, int startx, int starty, RGBA*color) 
+void textcallback(void*self, int*glyphs, int*xpos, int nr, int fontid, int fontsize, int startx, int starty, RGBA*color)
 {
     int font=-1,t;
-    if(nr<1) 
-	return;
+    if(nr<1)
+    return;
     printf("                <%2d glyphs in font %04d size %d, color #%02x%02x%02x%02x at %.2f,%.2f> ",nr, fontid, fontsize, color->r, color->g, color->b, color->a, (startx+xpos[0])/20.0, starty/20.0);
     for(t=0;t<fontnum;t++)
     {
-	if(fonts[t]->id == fontid) {
-	    font = t;
-	    break;
-	}
+    if(fonts[t]->id == fontid) {
+        font = t;
+        break;
+    }
     }
 
     for(t=0;t<nr;t++)
     {
-	unsigned int a;
-	if(font>=0) {
-	    if(glyphs[t] >= fonts[font]->numchars  /*glyph is in range*/
-		    || !fonts[font]->glyph2ascii /* font has ascii<->glyph mapping */
-	      ) a = glyphs[t];
-	    else {
-		if(fonts[font]->glyph2ascii[glyphs[t]])
-		    a = fonts[font]->glyph2ascii[glyphs[t]];
-		else
-		    a = glyphs[t];
-	    }
-	} else {
-	    a = glyphs[t];
-	}
-	if(a>=32) {
-	    char* utf8 = getUTF8(a);
-	    printf("%s", utf8);
-	} else {
-	    printf("\\x%x", (int)a);
-	}
+    unsigned int a;
+    if(font>=0) {
+        if(glyphs[t] >= fonts[font]->numchars  /*glyph is in range*/
+            || !fonts[font]->glyph2ascii /* font has ascii<->glyph mapping */
+          ) a = glyphs[t];
+        else {
+        if(fonts[font]->glyph2ascii[glyphs[t]])
+            a = fonts[font]->glyph2ascii[glyphs[t]];
+        else
+            a = glyphs[t];
+        }
+    } else {
+        a = glyphs[t];
+    }
+    if(a>=32) {
+        char* utf8 = getUTF8(a);
+        printf("%s", utf8);
+    } else {
+        printf("\\x%x", (int)a);
+    }
     }
     printf("\n");
 }
 
-void handleText(TAG*tag, char*prefix) 
+void handleText(TAG*tag, char*prefix)
 {
   printf("\n");
   if(placements) {
@@ -442,7 +444,7 @@ void handleText(TAG*tag, char*prefix)
       swf_ParseDefineText(tag,textcallback, 0);
   }
 }
-	    
+
 void handleDefineSound(TAG*tag)
 {
     U16 id = swf_GetU16(tag);
@@ -492,33 +494,33 @@ void handleEditText(TAG*tag)
     int t;
     id = swf_GetU16(tag);
     swf_GetRect(tag,0);
-    
+
     //swf_ResetReadBits(tag);
 
-    if (tag->readBit)  
-    { tag->pos++; 
-      tag->readBit = 0; 
+    if (tag->readBit)
+    { tag->pos++;
+      tag->readBit = 0;
     }
     flags = swf_GetBits(tag,16);
     if(flags & ET_HASFONT) {
-	swf_GetU16(tag); //font
-	swf_GetU16(tag); //fontheight
+    swf_GetU16(tag); //font
+    swf_GetU16(tag); //fontheight
     }
     if(flags & ET_HASTEXTCOLOR) {
-	swf_GetU8(tag); //rgba
-	swf_GetU8(tag);
-	swf_GetU8(tag);
-	swf_GetU8(tag);
+    swf_GetU8(tag); //rgba
+    swf_GetU8(tag);
+    swf_GetU8(tag);
+    swf_GetU8(tag);
     }
     if(flags & ET_HASMAXLENGTH) {
-	swf_GetU16(tag); //maxlength
+    swf_GetU16(tag); //maxlength
     }
     if(flags & ET_HASLAYOUT) {
-	swf_GetU8(tag); //align
-	swf_GetU16(tag); //left margin
-	swf_GetU16(tag); //right margin
-	swf_GetU16(tag); //indent
-	swf_GetU16(tag); //leading
+    swf_GetU8(tag); //align
+    swf_GetU16(tag); //left margin
+    swf_GetU16(tag); //right margin
+    swf_GetU16(tag); //indent
+    swf_GetU16(tag); //leading
     }
     printf(" variable \"%s\" ", &tag->data[tag->pos]);
     if(flags & ET_HTML) printf("(html)");
@@ -528,15 +530,15 @@ void handleEditText(TAG*tag)
 
     if(flags & (ET_X1 | ET_X3 ))
     {
-	printf(" undefined flags: %08x (%08x)", (flags&(ET_X1|ET_X3)), flags);
+    printf(" undefined flags: %08x (%08x)", (flags&(ET_X1|ET_X3)), flags);
     }
-    
+
     while(tag->data[tag->pos++]);
     if(flags & ET_HASTEXT)
    //  printf(" text \"%s\"\n", &tag->data[tag->pos]) //TODO
-	;
+    ;
 }
-void printhandlerflags(U32 handlerflags) 
+void printhandlerflags(U32 handlerflags)
 {
     if(handlerflags&1) printf("[on load]");
     if(handlerflags&2) printf("[enter frame]");
@@ -571,11 +573,11 @@ void handleVideoStream(TAG*tag, char*prefix)
     U8 codec = swf_GetU8(tag);
     printf(" (%d frames, %dx%d", frames, width, height);
     if(flags&1)
-	printf(" smoothed");
+    printf(" smoothed");
     if(codec == 2)
-	printf(" sorenson h.263)");
+    printf(" sorenson h.263)");
     else
-	printf(" codec 0x%02x)", codec);
+    printf(" codec 0x%02x)", codec);
 }
 void handleVideoFrame(TAG*tag, char*prefix)
 {
@@ -597,14 +599,14 @@ void handleVideoFrame(TAG*tag, char*prefix)
     sizeflags = swf_GetBits(tag, 3);
     switch(sizeflags)
     {
-	case 0: width = swf_GetBits(tag, 8); height = swf_GetBits(tag, 8); break;
-	case 1: width = swf_GetBits(tag, 16); height = swf_GetBits(tag, 16); break;
-	case 2: width = 352; height = 288; break;
-	case 3: width = 176; height = 144; break;
-	case 4: width = 128; height = 96; break;
-	case 5: width = 320; height = 240; break;
-	case 6: width = 160; height = 120; break;
-	case 7: width = -1; height = -1;/*reserved*/ break;
+    case 0: width = swf_GetBits(tag, 8); height = swf_GetBits(tag, 8); break;
+    case 1: width = swf_GetBits(tag, 16); height = swf_GetBits(tag, 16); break;
+    case 2: width = 352; height = 288; break;
+    case 3: width = 176; height = 144; break;
+    case 4: width = 128; height = 96; break;
+    case 5: width = 320; height = 240; break;
+    case 6: width = 160; height = 120; break;
+    case 7: width = -1; height = -1;/*reserved*/ break;
     }
     printf("%dx%d ", width, height);
     type = swf_GetBits(tag, 2);
@@ -612,60 +614,60 @@ void handleVideoFrame(TAG*tag, char*prefix)
 
     deblock = swf_GetBits(tag, 1);
     if(deblock)
-	printf(" deblock %d ", deblock);
+    printf(" deblock %d ", deblock);
     quantizer = swf_GetBits(tag, 5);
     printf(" quant: %d ", quantizer);
 }
 
 void dumpFilter(FILTER*filter)
 {
-    if(filter->type == FILTERTYPE_BLUR) {
+	if(filter->type == FILTERTYPE_BLUR) {
 	FILTER_BLUR*f = (FILTER_BLUR*)filter;
 	printf("blurx: %f blury: %f\n", f->blurx, f->blury);
 	printf("passes: %d\n", f->passes);
-    } if(filter->type == FILTERTYPE_GLOW) {
+	} if(filter->type == FILTERTYPE_GLOW) {
 	FILTER_GLOW*f = (FILTER_GLOW*)filter;
 	printf("color %02x%02x%02x%02x\n", f->rgba.r,f->rgba.g,f->rgba.b,f->rgba.a);
 	printf("blurx: %f blury: %f strength: %f\n", f->blurx, f->blury, f->strength);
 	printf("passes: %d\n", f->passes);
-	printf("flags: %s%s%s\n", 
+	printf("flags: %s%s%s\n",
 		f->knockout?"knockout ":"",
 		f->composite?"composite ":"",
 		f->innerglow?"innerglow":"");
-    } if(filter->type == FILTERTYPE_DROPSHADOW) {
+	} if(filter->type == FILTERTYPE_DROPSHADOW) {
 	FILTER_DROPSHADOW*f = (FILTER_DROPSHADOW*)filter;
 	printf("blurx: %f blury: %f\n", f->blurx, f->blury);
 	printf("passes: %d\n", f->passes);
 	printf("angle: %f distance: %f\n", f->angle, f->distance);
 	printf("strength: %f passes: %d\n", f->strength, f->passes);
-	printf("flags: %s%s%s\n", 
+	printf("flags: %s%s%s\n",
 		f->knockout?"knockout ":"",
 		f->composite?"composite ":"",
 		f->innershadow?"innershadow ":"");
-    } if(filter->type == FILTERTYPE_BEVEL) {
+	} if(filter->type == FILTERTYPE_BEVEL) {
 	FILTER_BEVEL*f = (FILTER_BEVEL*)filter;
 	printf("blurx: %f blury: %f\n", f->blurx, f->blury);
 	printf("passes: %d\n", f->passes);
 	printf("angle: %f distance: %f\n", f->angle, f->distance);
 	printf("strength: %f passes: %d\n", f->strength, f->passes);
-	printf("flags: %s%s%s%s\n", 
+	printf("flags: %s%s%s%s\n",
 		f->ontop?"ontop":"",
 		f->knockout?"knockout ":"",
 		f->composite?"composite ":"",
 		f->innershadow?"innershadow ":"");
-    } if(filter->type == FILTERTYPE_GRADIENTGLOW) {
+	} if(filter->type == FILTERTYPE_GRADIENTGLOW) {
 	FILTER_GRADIENTGLOW*f = (FILTER_GRADIENTGLOW*)filter;
 	swf_DumpGradient(stdout, f->gradient);
 	printf("blurx: %f blury: %f\n", f->blurx, f->blury);
 	printf("angle: %f distance: %f\n", f->angle, f->distance);
 	printf("strength: %f passes: %d\n", f->strength, f->passes);
-	printf("flags: %s%s%s%s\n", 
+	printf("flags: %s%s%s%s\n",
 		f->knockout?"knockout ":"",
 		f->ontop?"ontop ":"",
 		f->composite?"composite ":"",
 		f->innershadow?"innershadow ":"");
-    }
-    rfx_free(filter);
+	}
+	rfx_free(filter);
 }
 
 void handlePlaceObject23(TAG*tag, char*prefix)
@@ -678,89 +680,89 @@ void handlePlaceObject23(TAG*tag, char*prefix)
     swf_SetTagPos(tag, 0);
     flags = swf_GetU8(tag);
     if(tag->id == ST_PLACEOBJECT3)
-	flags2 = swf_GetU8(tag);
+    flags2 = swf_GetU8(tag);
     swf_GetU16(tag); //depth
 
     //flags&1: move
     if(flags&2) swf_GetU16(tag); //id
     if(flags&4) {
-	swf_GetMatrix(tag,&m);
-	if(placements) {
-	    ppos[0] += sprintf(pstr[0], "| Matrix             ");
-	    ppos[1] += sprintf(pstr[1], "| %5.3f %5.3f %6.2f ", m.sx/65536.0, m.r1/65536.0, m.tx/20.0);
-	    ppos[2] += sprintf(pstr[2], "| %5.3f %5.3f %6.2f ", m.r0/65536.0, m.sy/65536.0, m.ty/20.0);
-	}
+    swf_GetMatrix(tag,&m);
+    if(placements) {
+        ppos[0] += sprintf(pstr[0], "| Matrix             ");
+        ppos[1] += sprintf(pstr[1], "| %5.3f %5.3f %6.2f ", m.sx/65536.0, m.r1/65536.0, m.tx/20.0);
+        ppos[2] += sprintf(pstr[2], "| %5.3f %5.3f %6.2f ", m.r0/65536.0, m.sy/65536.0, m.ty/20.0);
+    }
     }
     if(flags&8) {
-	swf_GetCXForm(tag, &cx, 1);
-	if(placements) {
-	    ppos[0] += sprintf(pstr[0]+ppos[0], "| CXForm    r    g    b    a ");
-	    ppos[1] += sprintf(pstr[1]+ppos[1], "| mul    %4.1f %4.1f %4.1f %4.1f ", cx.r0/256.0, cx.g0/256.0, cx.b0/256.0, cx.a0/256.0);
-	    ppos[2] += sprintf(pstr[2]+ppos[2], "| add    %4d %4d %4d %4d ", cx.r1, cx.g1, cx.b1, cx.a1);
-	}
+    swf_GetCXForm(tag, &cx, 1);
+    if(placements) {
+        ppos[0] += sprintf(pstr[0]+ppos[0], "| CXForm    r    g    b    a ");
+        ppos[1] += sprintf(pstr[1]+ppos[1], "| mul    %4.1f %4.1f %4.1f %4.1f ", cx.r0/256.0, cx.g0/256.0, cx.b0/256.0, cx.a0/256.0);
+        ppos[2] += sprintf(pstr[2]+ppos[2], "| add    %4d %4d %4d %4d ", cx.r1, cx.g1, cx.b1, cx.a1);
+    }
     }
     if(flags&16) {
-	U16 ratio = swf_GetU16(tag); //ratio
-	if(placements) {
-	    ppos[0] += sprintf(pstr[0]+ppos[0], "| Ratio ");
-	    ppos[1] += sprintf(pstr[1]+ppos[1], "| %-5d ", ratio);
-	    ppos[2] += sprintf(pstr[2]+ppos[2], "|       ");
-	}
+    U16 ratio = swf_GetU16(tag); //ratio
+    if(placements) {
+        ppos[0] += sprintf(pstr[0]+ppos[0], "| Ratio ");
+        ppos[1] += sprintf(pstr[1]+ppos[1], "| %-5d ", ratio);
+        ppos[2] += sprintf(pstr[2]+ppos[2], "|       ");
+    }
     }
     if(flags&64) {
-	U16 clip = swf_GetU16(tag); //clip
-	if(placements) {
-	    ppos[0] += sprintf(pstr[0]+ppos[0], "| Clip  ");
-	    ppos[1] += sprintf(pstr[1]+ppos[1], "| %-4d ", clip);
-	    ppos[2] += sprintf(pstr[2]+ppos[2], "|       ");
-	}
+    U16 clip = swf_GetU16(tag); //clip
+    if(placements) {
+        ppos[0] += sprintf(pstr[0]+ppos[0], "| Clip  ");
+        ppos[1] += sprintf(pstr[1]+ppos[1], "| %-4d ", clip);
+        ppos[2] += sprintf(pstr[2]+ppos[2], "|       ");
+    }
     }
     if(flags&32) { while(swf_GetU8(tag)); }
 
-    if(flags2&1) { // filter list
+	if(flags2&1) { // filter list
 	U8 num = swf_GetU8(tag);
 	if(placements)
-	    printf("\n%d filters\n", num);
+		printf("\n%d filters\n", num);
 	char*filtername[] = {"dropshadow","blur","glow","bevel","gradientglow","convolution","colormatrix","gradientbevel"};
 	int t;
 	for(t=0;t<num;t++) {
-	    FILTER*filter = swf_GetFilter(tag);
-	    if(!filter) {
-		printf("\n"); 
+		FILTER*filter = swf_GetFilter(tag);
+		if(!filter) {
+		printf("\n");
 		return;
-	    }
-	    if(placements) {
+		}
+		if(placements) {
 		printf("filter %d: %02x (%s)\n", t, filter->type, (filter->type<sizeof(filtername)/sizeof(filtername[0]))?filtername[filter->type]:"?");
 		dumpFilter(filter);
-	    }
+		}
 	}
-    }
-    if(flags2&2) { // blend mode
+	}
+	if(flags2&2) { // blend mode
 	U8 blendmode = swf_GetU8(tag);
 	if(placements) {
-	    int t;
-	    char name[80];
-	    sprintf(name, "%-5d", blendmode);
-	    for(t=0;blendModeNames[t];t++) {
+		int t;
+		char name[80];
+		sprintf(name, "%-5d", blendmode);
+		for(t=0;blendModeNames[t];t++) {
 		if(blendmode==t) {
-		    sprintf(name, "%-5s", blendModeNames[t]);
-		    break;
+			sprintf(name, "%-5s", blendModeNames[t]);
+			break;
 		}
-	    }
-	    ppos[0] += sprintf(pstr[0]+ppos[0], "| Blend ");
-	    ppos[1] += sprintf(pstr[1]+ppos[1], "| %s ", name);
-	    ppos[2] += sprintf(pstr[2]+ppos[2], "|       ");
+		}
+		ppos[0] += sprintf(pstr[0]+ppos[0], "| Blend ");
+		ppos[1] += sprintf(pstr[1]+ppos[1], "| %s ", name);
+		ppos[2] += sprintf(pstr[2]+ppos[2], "|       ");
 	}
-    }
+	}
 
-    if(placements && ppos[0]) {
+	if(placements && ppos[0]) {
 	printf("\n");
 	printf("%s %s\n", prefix, pstr[0]);
 	printf("%s %s\n", prefix, pstr[1]);
 	printf("%s %s", prefix, pstr[2]);
-    }
-    if(flags&128) {
-      if (action) {
+	}
+	if(flags&128) {
+	  if (action) {
 	U16 reserved;
 	U32 globalflags;
 	U32 handlerflags;
@@ -769,45 +771,45 @@ void handlePlaceObject23(TAG*tag, char*prefix)
 	reserved = swf_GetU16(tag); // must be 0
 	globalflags = swf_GetU16(tag); //TODO: 32 if version>=6
 	if(reserved) {
-	    printf("Unknown parameter field not zero: %04x\n", reserved);
-	    return;
+		printf("Unknown parameter field not zero: %04x\n", reserved);
+		return;
 	}
 	printf("global flags: %04x\n", globalflags);
 
 	handlerflags = swf_GetU16(tag); //TODO: 32 if version>=6
 	if(!handlerflags) {
-	    handlerflags = swf_GetU32(tag);
-	    is32 = 1;
+		handlerflags = swf_GetU32(tag);
+		is32 = 1;
 	}
 	while(handlerflags)  {
-	    int length;
-	    int t;
-	    ActionTAG*a;
+		int length;
+		int t;
+		ActionTAG*a;
 
-	    globalflags &= ~handlerflags;
-	    printf("%s flags %08x ",prefix, handlerflags);
-	    printhandlerflags(handlerflags);
-	    length = swf_GetU32(tag);
-	    printf(", %d bytes actioncode\n",length);
-	    a = swf_ActionGet(tag);
-	    swf_DumpActions(a,prefix);
-	    swf_ActionFree(a);
+		globalflags &= ~handlerflags;
+		printf("%s flags %08x ",prefix, handlerflags);
+		printhandlerflags(handlerflags);
+		length = swf_GetU32(tag);
+		printf(", %d bytes actioncode\n",length);
+		a = swf_ActionGet(tag);
+		swf_DumpActions(a,prefix);
+		swf_ActionFree(a);
 
-	    handlerflags = is32?swf_GetU32(tag):swf_GetU16(tag); //TODO: 32 if version>=6
+		handlerflags = is32?swf_GetU32(tag):swf_GetU16(tag); //TODO: 32 if version>=6
 	}
 	if(globalflags) // should go to sterr.
-	    printf("ERROR: unsatisfied handlerflags: %02x\n", globalflags);
-    } else {
-      printf(" has action code\n");
-    }
-    } else printf("\n");
+		printf("ERROR: unsatisfied handlerflags: %02x\n", globalflags);
+	} else {
+	  printf(" has action code\n");
+	}
+	} else printf("\n");
 }
 
 void handlePlaceObject(TAG*tag, char*prefix)
 {
     TAG*tag2 = swf_InsertTag(0, ST_PLACEOBJECT2);
     U16 id, depth;
-    MATRIX matrix; 
+    MATRIX matrix;
     CXFORM cxform;
 
     swf_SetTagPos(tag, 0);
@@ -827,29 +829,29 @@ void handlePlaceObject(TAG*tag, char*prefix)
 char stylebuf[256];
 char* fillstyle2str(FILLSTYLE*style)
 {
-    switch(style->type) {
+	switch(style->type) {
 	case 0x00:
-	    sprintf(stylebuf, "SOLID %02x%02x%02x%02x", style->color.r, style->color.g, style->color.b, style->color.a);
-	    break;
+		sprintf(stylebuf, "SOLID %02x%02x%02x%02x", style->color.r, style->color.g, style->color.b, style->color.a);
+		break;
 	case 0x10: case 0x11: case 0x12: case 0x13:
-	    sprintf(stylebuf, "GRADIENT (%d steps)", style->gradient.num);
-	    break;
+		sprintf(stylebuf, "GRADIENT (%d steps)", style->gradient.num);
+		break;
 	case 0x40: case 0x42:
-	    /* TODO: display information about that bitmap */
-	    sprintf(stylebuf, "BITMAPt%s %d", (style->type&2)?"n":"", style->id_bitmap);
-	    /* TODO: show matrix */
-	    //swf_DumpMatrix(stdout, &style->m);
-	    break;
+		/* TODO: display information about that bitmap */
+		sprintf(stylebuf, "BITMAPt%s %d", (style->type&2)?"n":"", style->id_bitmap);
+		/* TODO: show matrix */
+		//swf_DumpMatrix(stdout, &style->m);
+		break;
 	case 0x41: case 0x43:
-	    /* TODO: display information about that bitmap */
-	    sprintf(stylebuf, "BITMAPc%s %d", (style->type&2)?"n":"", style->id_bitmap);
-	    /* TODO: show matrix */
-	    //swf_DumpMatrix(stdout, &style->m);
-	    break;
+		/* TODO: display information about that bitmap */
+		sprintf(stylebuf, "BITMAPc%s %d", (style->type&2)?"n":"", style->id_bitmap);
+		/* TODO: show matrix */
+		//swf_DumpMatrix(stdout, &style->m);
+		break;
 	default:
-	    sprintf(stylebuf, "UNKNOWN[%02x]",style->type);
-    }
-    return stylebuf;
+		sprintf(stylebuf, "UNKNOWN[%02x]",style->type);
+	}
+	return stylebuf;
 }
 char* linestyle2str(LINESTYLE*style)
 {
@@ -869,60 +871,60 @@ void handleShape(TAG*tag, char*prefix)
 
     max = shape.numlinestyles > shape.numfillstyles?shape.numlinestyles:shape.numfillstyles;
 
-    if(max) printf("%s | fillstyles(%02d)        linestyles(%02d)\n", 
-	    prefix,
-	    shape.numfillstyles,
-	    shape.numlinestyles
-	    );
-    else    printf("%s | (Neither line nor fill styles)\n", prefix);
+	if(max) printf("%s | fillstyles(%02d)        linestyles(%02d)\n",
+		prefix,
+		shape.numfillstyles,
+		shape.numlinestyles
+		);
+	else    printf("%s | (Neither line nor fill styles)\n", prefix);
 
-    for(t=0;t<max;t++) {
+	for(t=0;t<max;t++) {
 	printf("%s", prefix);
 	if(t < shape.numfillstyles) {
-	    printf(" | %-2d) %-18.18s", t+1, fillstyle2str(&shape.fillstyles[t]));
+		printf(" | %-2d) %-18.18s", t+1, fillstyle2str(&shape.fillstyles[t]));
 	} else {
-	    printf("                         ");
+		printf("                         ");
 	}
 	if(t < shape.numlinestyles) {
-	    printf("%-2d) %s", t+1, linestyle2str(&shape.linestyles[t]));
+		printf("%-2d) %s", t+1, linestyle2str(&shape.linestyles[t]));
 	}
 	printf("\n");
-        //if(shape.fillstyles[t].type&0x40) {
-        //    MATRIX m = shape.fillstyles[t].m;
-        //    swf_DumpMatrix(stdout, &m);
-        //}
-    }
+		//if(shape.fillstyles[t].type&0x40) {
+		//    MATRIX m = shape.fillstyles[t].m;
+		//    swf_DumpMatrix(stdout, &m);
+		//}
+	}
 
-    printf("%s |\n", prefix);
+	printf("%s |\n", prefix);
 
     line = shape.lines;
     while(line) {
-	printf("%s | fill: %02d/%02d line:%02d - ",
-		prefix, 
-		line->fillstyle0,
-		line->fillstyle1,
-		line->linestyle);
-	if(line->type == moveTo) {
-	    printf("moveTo %.2f %.2f\n", line->x/20.0, line->y/20.0);
-	} else if(line->type == lineTo) {
-	    printf("lineTo %.2f %.2f\n", line->x/20.0, line->y/20.0);
-	} else if(line->type == splineTo) {
-	    printf("splineTo (%.2f %.2f) %.2f %.2f\n", 
-		    line->sx/20.0, line->sy/20.0,
-		    line->x/20.0, line->y/20.0
-		    );
-	}
-	line = line->next;
+    printf("%s | fill: %02d/%02d line:%02d - ",
+        prefix,
+        line->fillstyle0,
+        line->fillstyle1,
+        line->linestyle);
+    if(line->type == moveTo) {
+        printf("moveTo %.2f %.2f\n", line->x/20.0, line->y/20.0);
+    } else if(line->type == lineTo) {
+        printf("lineTo %.2f %.2f\n", line->x/20.0, line->y/20.0);
+    } else if(line->type == splineTo) {
+        printf("splineTo (%.2f %.2f) %.2f %.2f\n",
+            line->sx/20.0, line->sy/20.0,
+            line->x/20.0, line->y/20.0
+            );
+    }
+    line = line->next;
     }
     printf("%s |\n", prefix);
 }
-    
+
 void fontcallback1(void*self, U16 id,U8 * name)
 { fontnum++;
 }
 
 void fontcallback2(void*self, U16 id,U8 * name)
-{ 
+{
   swf_FontExtract(&swf,id,&fonts[fontnum]);
   fontnum++;
 }
@@ -938,20 +940,20 @@ void hexdumpTag(TAG*tag, char* prefix)
     char ascii[32];
     printf("                %s-=> ",prefix);
     for(t=0;t<tag->len;t++) {
-	printf("%02x ", tag->data[t]);
-	ascii[t&15] = printable(tag->data[t]);
-	if((t && ((t&15)==15)) || (t==tag->len-1))
-	{
-	    int s,p=((t)&15)+1;
-	    ascii[p] = 0;
-	    for(s=p-1;s<16;s++) {
-		printf("   ");
-	    }
-	    if(t==tag->len-1)
-		printf(" %s\n", ascii);
-	    else
-		printf(" %s\n                %s-=> ",ascii,prefix);
-	}
+    printf("%02x ", tag->data[t]);
+    ascii[t&15] = printable(tag->data[t]);
+    if((t && ((t&15)==15)) || (t==tag->len-1))
+    {
+        int s,p=((t)&15)+1;
+        ascii[p] = 0;
+        for(s=p-1;s<16;s++) {
+        printf("   ");
+        }
+        if(t==tag->len-1)
+        printf(" %s\n", ascii);
+        else
+        printf(" %s\n                %s-=> ",ascii,prefix);
+    }
     }
 }
 
@@ -986,9 +988,9 @@ void handleExportAssets(TAG*tag, char* prefix)
     num = swf_GetU16(tag);
     for(t=0;t<num;t++)
     {
-	id = swf_GetU16(tag);
-	name = swf_GetString(tag);
-	printf("%sexports %04d as \"%s\"\n", prefix, id, name);
+    id = swf_GetU16(tag);
+    name = swf_GetString(tag);
+    printf("%sexports %04d as \"%s\"\n", prefix, id, name);
     }
 }
 
@@ -1004,18 +1006,18 @@ static void handleFontAlign1(TAG*tag)
     else printf("?, ");
     int num=0;
     while(tag->pos < tag->len) {
-	int nr = swf_GetU8(tag); // should be 2
-	int t;
-	if(nr>2) {
-	    printf("*** unsupported multiboxes ***, ");
-	    break;
-	}
-	for(t=0;t<nr;t++) {
-	    float v1 = swf_GetF16(tag);
-	    float v2 = swf_GetF16(tag);
-	}
-	U8 xyflags = swf_GetU8(tag);
-	num++;
+    int nr = swf_GetU8(tag); // should be 2
+    int t;
+    if(nr>2) {
+        printf("*** unsupported multiboxes ***, ");
+        break;
+    }
+    for(t=0;t<nr;t++) {
+        float v1 = swf_GetF16(tag);
+        float v2 = swf_GetF16(tag);
+    }
+    U8 xyflags = swf_GetU8(tag);
+    num++;
     }
     printf(" %d glyphs", num);
 }
@@ -1023,12 +1025,12 @@ static void handleFontAlign1(TAG*tag)
 #define ALIGN_WITH_GLYPHS
 static void handleFontAlign2(TAG*tag, char*prefix)
 {
-    if(!showfonts)
+	if(!showfonts)
 	return;
-    swf_SetTagPos(tag, 0);
-    U16 id = swf_GetU16(tag);
-    swf_GetU8(tag);
-    int num = 0;
+	swf_SetTagPos(tag, 0);
+	U16 id = swf_GetU16(tag);
+	swf_GetU8(tag);
+	int num = 0;
 #ifdef ALIGN_WITH_GLYPHS
     SWF swf;
     swf.firstTag = tag;
@@ -1038,48 +1040,48 @@ static void handleFontAlign2(TAG*tag, char*prefix)
 #endif
     swf_SetTagPos(tag, 3);
     while(tag->pos < tag->len) {
-	printf("%sglyph %d) ", prefix, num);
-	int nr = swf_GetU8(tag); // should be 2
-	int t;
-	for(t=0;t<2;t++) {
-	    // pos
-	    float v = swf_GetF16(tag);
-	    printf("%f ", v*1024.0);
-	}
-	int s;
-	for(s=0;s<nr-1;s++) {
-	    for(t=0;t<2;t++) {
-		// width
-		float v = swf_GetF16(tag);
-		printf("+%f ", v*1024.0);
-	    }
-	}
-	U8 xyflags = swf_GetU8(tag);
-	printf("xy:%02x\n", xyflags);
+    printf("%sglyph %d) ", prefix, num);
+    int nr = swf_GetU8(tag); // should be 2
+    int t;
+    for(t=0;t<2;t++) {
+        // pos
+        float v = swf_GetF16(tag);
+        printf("%f ", v*1024.0);
+    }
+    int s;
+    for(s=0;s<nr-1;s++) {
+        for(t=0;t<2;t++) {
+        // width
+        float v = swf_GetF16(tag);
+        printf("+%f ", v*1024.0);
+        }
+    }
+    U8 xyflags = swf_GetU8(tag);
+    printf("xy:%02x\n", xyflags);
 
 #ifdef ALIGN_WITH_GLYPHS
 	if(font && num<font->numchars) {
-	    SHAPE2* shape = swf_ShapeToShape2(font->glyph[num].shape);
-	    SHAPELINE*line = shape->lines;
-	    while(line) {
+		SHAPE2* shape = swf_ShapeToShape2(font->glyph[num].shape);
+		SHAPELINE*line = shape->lines;
+		while(line) {
 		if(line->type == moveTo) {
-		    printf("%smoveTo %.2f %.2f\n", prefix, line->x/20.0, line->y/20.0);
+			printf("%smoveTo %.2f %.2f\n", prefix, line->x/20.0, line->y/20.0);
 		} else if(line->type == lineTo) {
-		    printf("%slineTo %.2f %.2f\n", prefix, line->x/20.0, line->y/20.0);
+			printf("%slineTo %.2f %.2f\n", prefix, line->x/20.0, line->y/20.0);
 		} else if(line->type == splineTo) {
-		    printf("%ssplineTo (%.2f %.2f) %.2f %.2f\n", prefix,
-			    line->sx/20.0, line->sy/20.0,
-			    line->x/20.0, line->y/20.0
-			    );
+			printf("%ssplineTo (%.2f %.2f) %.2f %.2f\n", prefix,
+				line->sx/20.0, line->sy/20.0,
+				line->x/20.0, line->y/20.0
+				);
 		}
 		line = line->next;
-	    }
-	    swf_Shape2Free(shape);
-	    free(shape);
+		}
+		swf_Shape2Free(shape);
+		free(shape);
 	}
 	if(num==font->numchars-1) break;
 #endif
-	num++;
+    num++;
     }
 }
 
@@ -1093,7 +1095,7 @@ void dumperror(const char* format, ...)
     vsnprintf(buf, sizeof(buf)-1, format, arglist);
     va_end(arglist);
 
-    if(!html && !xy)
+	if(!html && !xy)
 	printf("==== Error: %s ====\n", buf);
 }
 
@@ -1113,7 +1115,7 @@ char* timestring(double f)
 }
 
 int main (int argc,char ** argv)
-{ 
+{
     TAG*tag;
 #ifdef HAVE_STAT
     struct stat statbuf;
@@ -1141,9 +1143,9 @@ int main (int argc,char ** argv)
 
     f = open(filename,O_RDONLY|O_BINARY);
     if (f<0)
-    { 
-	char buffer[256];
-	sprintf(buffer, "Couldn't open %.200s", filename);
+    {
+    char buffer[256];
+    sprintf(buffer, "Couldn't open %.200s", filename);
         perror(buffer);
         exit(1);
     }
@@ -1160,7 +1162,7 @@ int main (int argc,char ** argv)
     } else {
         f = open(filename,O_RDONLY|O_BINARY);
         if FAILED(swf_ReadSWF(f,&swf))
-        { 
+        {
             fprintf(stderr, "%s is not a valid SWF file or contains errors.\n",filename);
             close(f);
             exit(1);
@@ -1185,101 +1187,101 @@ int main (int argc,char ** argv)
     ysize = (swf.movieSize.ymax-swf.movieSize.ymin)/20;
     if(xy)
     {
-	if(xy&1)
-	printf("-X %d", xsize);
+    if(xy&1)
+    printf("-X %d", xsize);
 
 	if((xy&1) && (xy&6))
 	printf(" ");
 
 	if(xy&2)
 	printf("-Y %d", ysize);
-	
+
 	if((xy&3) && (xy&4))
 	printf(" ");
 
 	if(xy&4)
 	printf("-r %.2f", swf.frameRate/256.0);
-	
+
 	if((xy&7) && (xy&8))
 	printf(" ");
-	
+
 	if(xy&8)
 	printf("-f %d", swf.frameCount);
-	
+
 	printf("\n");
 	return 0;
-    }
-    if(html)
-    {
+	}
+	if(html)
+	{
 	char*fileversions[] = {"","1,0,0,0", "2,0,0,0","3,0,0,0","4,0,0,0",
-			       "5,0,0,0","6,0,23,0","7,0,0,0","8,0,0,0","9,0,0,0","10,0,0,0", "11,0,0,0", "12,0,0,0"};
+				   "5,0,0,0","6,0,23,0","7,0,0,0","8,0,0,0","9,0,0,0","10,0,0,0", "11,0,0,0", "12,0,0,0"};
 	if(swf.fileVersion>10) {
-	    fprintf(stderr, "Fileversion>10\n");
-	    exit(1);
+		fprintf(stderr, "Fileversion>10\n");
+		exit(1);
 	}
 
 	if(xhtml) {
-	    printf("<object type=\"application/x-shockwave-flash\" data=\"%s\" width=\"%d\" height=\"%d\">\n"
-			    "<param name=\"movie\" value=\"%s\"/>\n"
-			    "<param name=\"play\" value=\"true\"/>\n"
-			    "<param name=\"loop\" value=\"false\"/>\n"
-			    "<param name=\"quality\" value=\"high\"/>\n"
-			    "<param name=\"loop\" value=\"false\"/>\n"
-			    "</object>\n\n", filename, xsize, ysize, filename);
+		printf("<object type=\"application/x-shockwave-flash\" data=\"%s\" width=\"%d\" height=\"%d\">\n"
+				"<param name=\"movie\" value=\"%s\"/>\n"
+				"<param name=\"play\" value=\"true\"/>\n"
+				"<param name=\"loop\" value=\"false\"/>\n"
+				"<param name=\"quality\" value=\"high\"/>\n"
+				"<param name=\"loop\" value=\"false\"/>\n"
+				"</object>\n\n", filename, xsize, ysize, filename);
 	} else {
-	    printf("<OBJECT CLASSID=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\"\n"
+		printf("<OBJECT CLASSID=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\"\n"
 		   " WIDTH=\"%d\"\n"
 		   //" BGCOLOR=#ffffffff\n"?
 		   " HEIGHT=\"%d\"\n"
 		   //http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,23,0?
 		   " CODEBASE=\"http://active.macromedia.com/flash5/cabs/swflash.cab#version=%s\">\n"
 		   "  <PARAM NAME=\"MOVIE\" VALUE=\"%s\">\n"
-		   "  <PARAM NAME=\"PLAY\" VALUE=\"true\">\n" 
+		   "  <PARAM NAME=\"PLAY\" VALUE=\"true\">\n"
 		   "  <PARAM NAME=\"LOOP\" VALUE=\"true\">\n"
 		   "  <PARAM NAME=\"QUALITY\" VALUE=\"high\">\n"
 		   "  <PARAM NAME=\"ALLOWSCRIPTACCESS\" VALUE=\"always\">\n"
 		   "  <EMBED SRC=\"%s\" WIDTH=\"%d\" HEIGHT=\"%d\"\n" //bgcolor=#ffffff?
 		   "   PLAY=\"true\" ALIGN=\"\" LOOP=\"true\" QUALITY=\"high\"\n"
 		   "   TYPE=\"application/x-shockwave-flash\"\n"
-                   "   ALLOWSCRIPTACCESS=\"always\"\n"
+				   "   ALLOWSCRIPTACCESS=\"always\"\n"
 		   "   PLUGINSPAGE=\"http://get.adobe.com/flashplayer/\">\n"
-		   "  </EMBED>\n" 
-		   "</OBJECT>\n", xsize, ysize, fileversions[swf.fileVersion], 
+		   "  </EMBED>\n"
+		   "</OBJECT>\n", xsize, ysize, fileversions[swf.fileVersion],
 				  filename, filename, xsize, ysize);
 	}
 	return 0;
-    } 
-    printf("[HEADER]        File version: %d\n", swf.fileVersion);
-    if(compressed) {
+	}
+	printf("[HEADER]        File version: %d\n", swf.fileVersion);
+	if(compressed) {
 	printf("[HEADER]        File is zlib compressed.");
 	if(filesize && swf.fileSize)
-	    printf(" Ratio: %02d%%\n", filesize*100/(swf.fileSize));
+		printf(" Ratio: %02d%%\n", filesize*100/(swf.fileSize));
 	else
-	    printf("\n");
-    }
-    printf("[HEADER]        File size: %d%s\n", swf.fileSize, swf.compressed?" (Depacked)":"");
-    printf("[HEADER]        Frame rate: %f\n",swf.frameRate/256.0);
-    printf("[HEADER]        Frame count: %d\n",swf.frameCount);
-    printf("[HEADER]        Movie width: %.2f",(swf.movieSize.xmax-swf.movieSize.xmin)/20.0);
-    if(swf.movieSize.xmin)
+		printf("\n");
+	}
+	printf("[HEADER]        File size: %d%s\n", swf.fileSize, swf.compressed?" (Depacked)":"");
+	printf("[HEADER]        Frame rate: %f\n",swf.frameRate/256.0);
+	printf("[HEADER]        Frame count: %d\n",swf.frameCount);
+	printf("[HEADER]        Movie width: %.2f",(swf.movieSize.xmax-swf.movieSize.xmin)/20.0);
+	if(swf.movieSize.xmin)
 	printf(" (left offset: %.2f)\n", swf.movieSize.xmin/20.0);
-    else 
+	else
 	printf("\n");
-    printf("[HEADER]        Movie height: %.2f",(swf.movieSize.ymax-swf.movieSize.ymin)/20.0);
-    if(swf.movieSize.ymin)
+	printf("[HEADER]        Movie height: %.2f",(swf.movieSize.ymax-swf.movieSize.ymin)/20.0);
+	if(swf.movieSize.ymin)
 	printf(" (top offset: %.2f)\n", swf.movieSize.ymin/20.0);
-    else 
+	else
 	printf("\n");
 
     tag = swf.firstTag;
-   
-    if(showtext) {
+
+	if(showtext) {
 	fontnum = 0;
 	swf_FontEnumerate(&swf,&fontcallback1, 0);
 	fonts = (SWFFONT**)malloc(fontnum*sizeof(SWFFONT*));
 	fontnum = 0;
 	swf_FontEnumerate(&swf,&fontcallback2, 0);
-    }
+	}
 
     while(tag) {
         char*name = swf_TagGetName(tag);
@@ -1289,48 +1291,48 @@ int main (int argc,char ** argv)
             //tag = tag->next;
             //continue;
         }
-	if(!name) {
-	    name = "UNKNOWN TAG";
-	}
-	if(cumulative) {
-	    filepos += tag->len;
-	    printf("[%03x] %9d %9d %s%s", tag->id, tag->len, filepos, prefix, swf_TagGetName(tag));
-	} else {
-	    printf("[%03x] %9d %s%s", tag->id, tag->len, prefix, swf_TagGetName(tag));
-	}
-	
+    if(!name) {
+        name = "UNKNOWN TAG";
+    }
+    if(cumulative) {
+        filepos += tag->len;
+        printf("[%03x] %9d %9d %s%s", tag->id, tag->len, filepos, prefix, swf_TagGetName(tag));
+    } else {
+        printf("[%03x] %9d %s%s", tag->id, tag->len, prefix, swf_TagGetName(tag));
+    }
+
         if(tag->id == ST_PLACEOBJECT) {
             printf(" places id %04d at depth %04x", swf_GetPlaceID(tag), swf_GetDepth(tag));
             if(swf_GetName(tag))
                 printf(" name \"%s\"",swf_GetName(tag));
         }
-	else if(tag->id == ST_PLACEOBJECT2 || tag->id == ST_PLACEOBJECT3) {
-	    if(tag->data[0]&1)
-		printf(" moves");
-	    else
-		printf(" places");
-	    
-	    if(tag->data[0]&2)
+    else if(tag->id == ST_PLACEOBJECT2 || tag->id == ST_PLACEOBJECT3) {
+        if(tag->data[0]&1)
+        printf(" moves");
+        else
+        printf(" places");
+
+		if(tag->data[0]&2)
 		printf(" id %04d",swf_GetPlaceID(tag));
-	    else
+		else
 		printf(" object");
 
-            printf(" at depth %04d", swf_GetDepth(tag));
+			printf(" at depth %04d", swf_GetDepth(tag));
 
-	    if(tag->id == ST_PLACEOBJECT3 && tag->data[1]&4)
+		if(tag->id == ST_PLACEOBJECT3 && tag->data[1]&4)
 		printf(" as bitmap");
-	   
-	    swf_SetTagPos(tag, 0);
-	    if(tag->data[0]&64) {
+
+		swf_SetTagPos(tag, 0);
+		if(tag->data[0]&64) {
 		SWFPLACEOBJECT po;
 		swf_GetPlaceObject(tag, &po);
 		printf(" (clip to %04d)", po.clipdepth);
 		swf_PlaceObjectFree(&po);
-	    }
-            if(swf_GetName(tag))
-                printf(" name \"%s\"",swf_GetName(tag));
+		}
+			if(swf_GetName(tag))
+				printf(" name \"%s\"",swf_GetName(tag));
 
-	}
+    }
         else if(tag->id == ST_REMOVEOBJECT) {
             printf(" removes id %04d from depth %04d", swf_GetPlaceID(tag), swf_GetDepth(tag));
         }
@@ -1368,191 +1370,191 @@ int main (int argc,char ** argv)
             }
             swf_SetTagPos(tag, 0);
         }
-	else if(tag->id == ST_STARTSOUND) {
-	    U8 flags;
-	    U16 id;
-	    id = swf_GetU16(tag);
-	    flags = swf_GetU8(tag);
-	    if(flags & 32)
-		printf(" stops sound with id %04d", id);
-	    else
-		printf(" starts sound with id %04d", id);
-	    if(flags & 16)
-		printf(" (if not already playing)");
-	    if(flags & 1)
-		swf_GetU32(tag);
-	    if(flags & 2)
-		swf_GetU32(tag);
-	    if(flags & 4) {
-		printf(" looping %d times", swf_GetU16(tag));
-	    }
-	}
-	else if(tag->id == ST_FRAMELABEL) {
-	    int l = strlen((char*)tag->data);
-	    printf(" \"%s\"", tag->data);
-	    if((l+1) < tag->len) {
-		printf(" has %d extra bytes", tag->len-1-l);
-		if(tag ->len - (l+1) == 1 && tag->data[tag->len-1] == 1)
-		    printf(" (ANCHOR)");
-	    }
-	    if((framelabel && !issprite) ||
-	       (spriteframelabel && issprite)) {
-		dumperror("Frame %d has more than one label", 
-			issprite?spriteframe:mainframe);
-	    }
-	    if(issprite) spriteframelabel = (char*)tag->data;
-	    else framelabel = (char*)tag->data;
-	}
-	else if(tag->id == ST_SHOWFRAME) {
-	    char*label = issprite?spriteframelabel:framelabel;
-	    int frame = issprite?spriteframe:mainframe;
-	    int nframe = frame;
-	    if(!label) {
-		while(tag->next && tag->next->id == ST_SHOWFRAME && tag->next->len == 0) {
-		    tag = tag->next;
-		    if(issprite) spriteframe++;
-		    else mainframe++;
-		    nframe++;
-		}
-	    }
-	    if(nframe == frame)
-		printf(" %d (%s)", frame+1, timestring(frame*(256.0/(swf.frameRate+0.1))));
-	    else
-		printf(" %d-%d (%s-%s)", frame+1, nframe+1,
-			timestring(frame*(256.0/(swf.frameRate+0.1))),
-			timestring(nframe*(256.0/(swf.frameRate+0.1)))
-			);
-	    if(label)
-		printf(" (label \"%s\")", label);
-	    if(issprite) {spriteframe++; spriteframelabel = 0;}
-	    if(!issprite) {mainframe++; framelabel = 0;}
-	}
+    else if(tag->id == ST_STARTSOUND) {
+        U8 flags;
+        U16 id;
+        id = swf_GetU16(tag);
+        flags = swf_GetU8(tag);
+        if(flags & 32)
+        printf(" stops sound with id %04d", id);
+        else
+        printf(" starts sound with id %04d", id);
+        if(flags & 16)
+        printf(" (if not already playing)");
+        if(flags & 1)
+        swf_GetU32(tag);
+        if(flags & 2)
+        swf_GetU32(tag);
+        if(flags & 4) {
+        printf(" looping %d times", swf_GetU16(tag));
+        }
+    }
+    else if(tag->id == ST_FRAMELABEL) {
+        int l = strlen((char*)tag->data);
+        printf(" \"%s\"", tag->data);
+        if((l+1) < tag->len) {
+        printf(" has %d extra bytes", tag->len-1-l);
+        if(tag ->len - (l+1) == 1 && tag->data[tag->len-1] == 1)
+            printf(" (ANCHOR)");
+        }
+        if((framelabel && !issprite) ||
+           (spriteframelabel && issprite)) {
+        dumperror("Frame %d has more than one label",
+            issprite?spriteframe:mainframe);
+        }
+        if(issprite) spriteframelabel = (char*)tag->data;
+        else framelabel = (char*)tag->data;
+    }
+    else if(tag->id == ST_SHOWFRAME) {
+        char*label = issprite?spriteframelabel:framelabel;
+        int frame = issprite?spriteframe:mainframe;
+        int nframe = frame;
+        if(!label) {
+        while(tag->next && tag->next->id == ST_SHOWFRAME && tag->next->len == 0) {
+            tag = tag->next;
+            if(issprite) spriteframe++;
+            else mainframe++;
+            nframe++;
+        }
+        }
+        if(nframe == frame)
+        printf(" %d (%s)", frame+1, timestring(frame*(256.0/(swf.frameRate+0.1))));
+        else
+        printf(" %d-%d (%s-%s)", frame+1, nframe+1,
+            timestring(frame*(256.0/(swf.frameRate+0.1))),
+            timestring(nframe*(256.0/(swf.frameRate+0.1)))
+            );
+        if(label)
+        printf(" (label \"%s\")", label);
+        if(issprite) {spriteframe++; spriteframelabel = 0;}
+        if(!issprite) {mainframe++; framelabel = 0;}
+    }
         else if(tag->id == ST_SETBACKGROUNDCOLOR) {
-	    U8 r = swf_GetU8(tag);
-	    U8 g = swf_GetU8(tag);
-	    U8 b = swf_GetU8(tag);
-	    printf(" (%02x/%02x/%02x)",r,g,b);
-	}
-	else if(tag->id == ST_PROTECT) {
-	    if(tag->len>0) {
-		printf(" %s", swf_GetString(tag));
-	    }
-	}
-	else if(tag->id == ST_DEFINEFONTALIGNZONES) {
-	    handleFontAlign1(tag);
-	}
-	else if(tag->id == ST_CSMTEXTSETTINGS) {
-	    U16 id = swf_GetU16(tag);
-	    U8 flags = swf_GetU8(tag);
-	    printf(" (");
-	    if(flags&0x40) {
-		printf("flashtype,");
-	    }
-	    switch(((flags>>3)&7)) {
-		case 0:printf("no grid,");break;
-		case 1:printf("pixel grid,");break;
-		case 2:printf("subpixel grid,");break;
-		case 3:printf("unknown grid,");break;
-	    }
-	    if(flags&0x87) 
-		printf("unknown[%08x],", flags);
-	    float thickness = swf_GetFixed(tag);
-	    float sharpness = swf_GetFixed(tag);
-	    printf("s=%.2f,t=%.2f)", thickness, sharpness);
-	    swf_GetU8(tag);
-	}
-	else if(swf_isDefiningTag(tag)) {
+        U8 r = swf_GetU8(tag);
+        U8 g = swf_GetU8(tag);
+        U8 b = swf_GetU8(tag);
+        printf(" (%02x/%02x/%02x)",r,g,b);
+    }
+    else if(tag->id == ST_PROTECT) {
+        if(tag->len>0) {
+        printf(" %s", swf_GetString(tag));
+        }
+    }
+    else if(tag->id == ST_DEFINEFONTALIGNZONES) {
+        handleFontAlign1(tag);
+    }
+    else if(tag->id == ST_CSMTEXTSETTINGS) {
+        U16 id = swf_GetU16(tag);
+        U8 flags = swf_GetU8(tag);
+        printf(" (");
+        if(flags&0x40) {
+        printf("flashtype,");
+        }
+        switch(((flags>>3)&7)) {
+        case 0:printf("no grid,");break;
+        case 1:printf("pixel grid,");break;
+        case 2:printf("subpixel grid,");break;
+        case 3:printf("unknown grid,");break;
+        }
+        if(flags&0x87)
+        printf("unknown[%08x],", flags);
+        float thickness = swf_GetFixed(tag);
+        float sharpness = swf_GetFixed(tag);
+        printf("s=%.2f,t=%.2f)", thickness, sharpness);
+        swf_GetU8(tag);
+    }
+    else if(swf_isDefiningTag(tag)) {
             U16 id = swf_GetDefineID(tag);
             printf(" defines id %04d", id);
             if(idtab[id])
                 dumperror("Id %04d is defined more than once.", id);
             idtab[id] = 1;
         }
-	else if(swf_isPseudoDefiningTag(tag)) {
+    else if(swf_isPseudoDefiningTag(tag)) {
             U16 id = swf_GetDefineID(tag);
             printf(" adds information to id %04d", id);
             if(!idtab[id])
                 dumperror("Id %04d is not yet defined.\n", id);
-	}
+    }
 
 	if(tag->id == ST_DEFINEBITSLOSSLESS ||
 	   tag->id == ST_DEFINEBITSLOSSLESS2) {
-	    handleDefineBits(tag);
-	    printf("\n");
+		handleDefineBits(tag);
+		printf("\n");
 	}
 	else if(tag->id == ST_DEFINESOUND) {
-	    handleDefineSound(tag);
-	    printf("\n");
+		handleDefineSound(tag);
+		printf("\n");
 	}
 	else if(tag->id == ST_VIDEOFRAME) {
-	    handleVideoFrame(tag, myprefix);
-	    printf("\n");
+		handleVideoFrame(tag, myprefix);
+		printf("\n");
 	}
 	else if(tag->id == ST_DEFINEVIDEOSTREAM) {
-	    handleVideoStream(tag, myprefix);
-	    printf("\n");
+		handleVideoStream(tag, myprefix);
+		printf("\n");
 	}
 	else if(tag->id == ST_DEFINEEDITTEXT) {
-	    handleEditText(tag);
-	    printf("\n");
+		handleEditText(tag);
+		printf("\n");
 	}
 	else if(tag->id == ST_DEFINEMOVIE) {
-	    U16 id = swf_GetU16(tag);
-	    char*s = swf_GetString(tag);
-	    printf(" URL: %s\n", s);
+		U16 id = swf_GetU16(tag);
+		char*s = swf_GetString(tag);
+		printf(" URL: %s\n", s);
 	}
 	else if(tag->id == ST_DEFINETEXT || tag->id == ST_DEFINETEXT2) {
-	    handleText(tag, myprefix);
+		handleText(tag, myprefix);
 	}
 	else if(tag->id == ST_DEFINESCALINGGRID) {
-	    U16 id = swf_GetU16(tag);
-	    SRECT r;
-	    swf_GetRect(tag, &r);
-	    printf(" (%.2f,%.2f)-(%.2f,%.2f)\n", r.xmin/20.0, r.ymin/20.0, r.xmax/20.0, r.ymax/20.0);
+		U16 id = swf_GetU16(tag);
+		SRECT r;
+		swf_GetRect(tag, &r);
+		printf(" (%.2f,%.2f)-(%.2f,%.2f)\n", r.xmin/20.0, r.ymin/20.0, r.xmax/20.0, r.ymax/20.0);
 	}
 	else if(tag->id == ST_PLACEOBJECT2 || tag->id == ST_PLACEOBJECT3) {
 	}
 	else if(tag->id == ST_NAMECHARACTER || tag->id==ST_DEFINEFONTNAME) {
-	    swf_GetU16(tag);
-	    printf(" \"%s\"\n", swf_GetString(tag));
+		swf_GetU16(tag);
+		printf(" \"%s\"\n", swf_GetString(tag));
 	}
 	else {
-	    printf("\n");
+		printf("\n");
 	}
 
 	if(bbox && swf_isDefiningTag(tag) && tag->id != ST_DEFINESPRITE) {
-	    SRECT r = swf_GetDefineBBox(tag);
-	    printf("                %s bbox [%.2f, %.2f, %.2f, %.2f]\n", prefix,
-		    r.xmin/20.0,
-		    r.ymin/20.0,
-		    r.xmax/20.0,
-		    r.ymax/20.0);
+		SRECT r = swf_GetDefineBBox(tag);
+		printf("                %s bbox [%.2f, %.2f, %.2f, %.2f]\n", prefix,
+			r.xmin/20.0,
+			r.ymin/20.0,
+			r.xmax/20.0,
+			r.ymax/20.0);
 	}
-        
-        sprintf(myprefix, "                %s", prefix);
+
+		sprintf(myprefix, "                %s", prefix);
 
         if(tag->id == ST_DEFINESPRITE) {
             sprintf(prefix, "         ");
-	    if(issprite) {
-		dumperror("Sprite definition inside a sprite definition");
-	    }
-	    issprite = 1;
-	    spriteframe = 0;
-	    spriteframelabel = 0;
+        if(issprite) {
+        dumperror("Sprite definition inside a sprite definition");
+        }
+        issprite = 1;
+        spriteframe = 0;
+        spriteframelabel = 0;
         }
         else if(tag->id == ST_END) {
             *prefix = 0;
-	    issprite = 0;
-	    spriteframelabel = 0;
-	    if(tag->len)
-		dumperror("End Tag not empty");
+        issprite = 0;
+        spriteframelabel = 0;
+        if(tag->len)
+        dumperror("End Tag not empty");
         }
         else if(tag->id == ST_IMPORTASSETS || tag->id == ST_IMPORTASSETS2) {
             handleImportAssets(tag, myprefix, tag->id==ST_IMPORTASSETS2?1:0);
         }
-	else if(tag->id == ST_EXPORTASSETS || tag->id == ST_SYMBOLCLASS) {
-	    handleExportAssets(tag, myprefix);
-	}
+    else if(tag->id == ST_EXPORTASSETS || tag->id == ST_SYMBOLCLASS) {
+        handleExportAssets(tag, myprefix);
+    }
         else if(tag->id == ST_DOACTION && action) {
             ActionTAG*actions;
             actions = swf_ActionGet(tag);
@@ -1569,80 +1571,80 @@ int main (int argc,char ** argv)
             actions = swf_ActionGet(tag);
             swf_DumpActions(actions, myprefix);
         }
-	else if(tag->id == ST_DEFINEBUTTON) {
+    else if(tag->id == ST_DEFINEBUTTON) {
             if(showbuttons) {
                 dumpButton(tag, myprefix);
             }
             if(action) {
-	        dumpButtonActions(tag, myprefix);
+            dumpButtonActions(tag, myprefix);
             }
-	}
-	else if(swf_isFontTag(tag) && showfonts) {
-	    dumpFont(tag, myprefix);
-	}
-	else if(tag->id == ST_DEFINEBUTTON2) {
+    }
+    else if(swf_isFontTag(tag) && showfonts) {
+        dumpFont(tag, myprefix);
+    }
+    else if(tag->id == ST_DEFINEBUTTON2) {
             if(action) {
-	        dumpButton2Actions(tag, myprefix);
+            dumpButton2Actions(tag, myprefix);
             }
-	}
-	else if(tag->id == ST_PLACEOBJECT) {
-	    handlePlaceObject(tag, myprefix);
-	}
-	else if(tag->id == ST_PLACEOBJECT2 || tag->id == ST_PLACEOBJECT3) {
-	    handlePlaceObject23(tag, myprefix);
-	}
-	else if(tag->id == ST_DEFINEFONTALIGNZONES) {
-	    handleFontAlign2(tag, myprefix);
-	}
-	else if(tag->id == ST_DEFINEFONTNAME) {
-	    swf_SetTagPos(tag, 0);
-	    swf_GetU16(tag); //id
-	    swf_GetString(tag); //name
-	    char* copyright = swf_GetString(tag);
-	    printf("%s%s\n", myprefix, copyright);
-	}
-	else if(tag->id == ST_DEFINESHAPE ||
-		tag->id == ST_DEFINESHAPE2 ||
-		tag->id == ST_DEFINESHAPE3 ||
-		tag->id == ST_DEFINESHAPE4) {
-	    if(showshapes)
-		handleShape(tag, myprefix);
-	}
+    }
+    else if(tag->id == ST_PLACEOBJECT) {
+        handlePlaceObject(tag, myprefix);
+    }
+    else if(tag->id == ST_PLACEOBJECT2 || tag->id == ST_PLACEOBJECT3) {
+        handlePlaceObject23(tag, myprefix);
+    }
+    else if(tag->id == ST_DEFINEFONTALIGNZONES) {
+        handleFontAlign2(tag, myprefix);
+    }
+    else if(tag->id == ST_DEFINEFONTNAME) {
+        swf_SetTagPos(tag, 0);
+        swf_GetU16(tag); //id
+        swf_GetString(tag); //name
+        char* copyright = swf_GetString(tag);
+        printf("%s%s\n", myprefix, copyright);
+    }
+    else if(tag->id == ST_DEFINESHAPE ||
+        tag->id == ST_DEFINESHAPE2 ||
+        tag->id == ST_DEFINESHAPE3 ||
+        tag->id == ST_DEFINESHAPE4) {
+        if(showshapes)
+        handleShape(tag, myprefix);
+    }
 
 	if(tag->len && used) {
-	    int num = swf_GetNumUsedIDs(tag);
-	    int* used;
-	    int t;
-	    if(num) {
+		int num = swf_GetNumUsedIDs(tag);
+		int* used;
+		int t;
+		if(num) {
 		used = (int*)malloc(sizeof(int)*num);
 		swf_GetUsedIDs(tag, used);
 		printf("%s%suses IDs: ", indent, prefix);
 		for(t=0;t<num;t++) {
-		    int id;
-		    swf_SetTagPos(tag, used[t]);
-		    id = swf_GetU16(tag);
-		    printf("%d%s", id, t<num-1?", ":"");
-		    if(!idtab[id]) {
+			int id;
+			swf_SetTagPos(tag, used[t]);
+			id = swf_GetU16(tag);
+			printf("%d%s", id, t<num-1?", ":"");
+			if(!idtab[id]) {
 			dumperror("Id %04d is not yet defined.\n", id);
-		    }
+			}
 		}
 		printf("\n");
-	    }
+		}
 	}
-	
+
 	if(tag->id == ST_FREECHARACTER) {
-	    U16 id;
-	    swf_SetTagPos(tag, 0);
-	    id = swf_GetU16(tag);
-	    idtab[id] = 0;
+		U16 id;
+		swf_SetTagPos(tag, 0);
+		id = swf_GetU16(tag);
+		idtab[id] = 0;
 	}
 
 	if(tag->len && hex) {
-	    hexdumpTag(tag, prefix);
+		hexdumpTag(tag, prefix);
 	}
-        tag = tag->next;
+		tag = tag->next;
 	fflush(stdout);
-    }
+	}
 
     swf_FreeTags(&swf);
     return 0;

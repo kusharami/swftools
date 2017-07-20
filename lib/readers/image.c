@@ -12,6 +12,9 @@
 
 typedef struct _image_page_internal
 {
+#ifdef _MSC_VER
+    char *any[];
+#endif
 } image_page_internal_t;
 
 typedef struct _image_doc_internal
@@ -66,7 +69,7 @@ void imagepage_rendersection(gfxpage_t*page, gfxdevice_t*output, gfxcoord_t x, g
     m.m11 = 1;
     m.tx = x;
     m.ty = y;
-    
+
     gfxline_t* rect = gfxline_makerectangle(0, 0, pi->img.width, pi->img.height);
     gfxline_t* rect2 = gfxline_makerectangle(_x1, _y1, _x2, _y2);
 
@@ -97,7 +100,7 @@ gfxpage_t* image_doc_getpage(gfxdocument_t*doc, int page)
     image_doc_internal_t*di= (image_doc_internal_t*)doc->internal;
     if(page != 1)
         return 0;
-    
+
     gfxpage_t* image_page = (gfxpage_t*)malloc(sizeof(gfxpage_t));
     image_page_internal_t*pi= (image_page_internal_t*)malloc(sizeof(image_page_internal_t));
     memset(pi, 0, sizeof(image_page_internal_t));
@@ -129,15 +132,15 @@ static gfxdocument_t*image_open(gfxsource_t*src, const char*filename)
     unsigned width = 0;
     unsigned height = 0;
 
-    if(!png_load(filename, &width, &height, (unsigned char**)&data)) {
+	if(!png_load(filename, &width, &height, (unsigned char**)&data)) {
 	if(!jpeg_load(filename, (unsigned char**)&data, &width, &height)) {
-	    msg("<error> Couldn't load image %s", filename);
-	    return 0;
+		msg("<error> Couldn't load image %s", filename);
+		return 0;
 	}
-    }
-    i->img.data = data;
-    i->img.width = width;
-    i->img.height = height;
+	}
+	i->img.data = data;
+	i->img.width = width;
+	i->img.height = height;
 
     image_doc->num_pages = 1;
     image_doc->internal = i;

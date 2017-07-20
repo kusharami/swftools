@@ -2,8 +2,8 @@
 
    Part of the swftools package.
 
-   Copyright (c) 2006 Matthias Kramm <kramm@quiss.org> 
- 
+   Copyright (c) 2006 Matthias Kramm <kramm@quiss.org>
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -22,13 +22,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <memory.h>
 #include "../types.h"
 #include "../mem.h"
 #include "../gfxdevice.h"
 #include "../gfxtools.h"
 #include "../utf8.h"
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 typedef struct _textpage {
     char*text;
@@ -54,10 +56,10 @@ void text_startpage(gfxdevice_t*dev, int width, int height)
 {
     internal_t*i = (internal_t*)dev->internal;
     if(!i->first_page) {
-	i->first_page = i->current_page = (textpage_t*)malloc(sizeof(textpage_t));
+    i->first_page = i->current_page = (textpage_t*)malloc(sizeof(textpage_t));
     } else {
-	i->current_page->next = (textpage_t*)malloc(sizeof(textpage_t));
-	i->current_page = i->current_page->next;
+    i->current_page->next = (textpage_t*)malloc(sizeof(textpage_t));
+    i->current_page = i->current_page->next;
     }
     i->current_page->textsize = 4096;
     i->current_page->text = (char*)malloc(i->current_page->textsize);
@@ -100,8 +102,8 @@ static void addchar(gfxdevice_t*dev, int unicode)
         text_startpage(dev, 0, 0);
     }
     if(i->current_page->textpos + 10 > i->current_page->textsize) {
-	i->current_page->textsize += 4096;
-	i->current_page->text = realloc(i->current_page->text, i->current_page->textsize);
+    i->current_page->textsize += 4096;
+    i->current_page->text = realloc(i->current_page->text, i->current_page->textsize);
     }
     writeUTF8(unicode, &i->current_page->text[i->current_page->textpos]);
     i->current_page->textpos += strlen(&i->current_page->text[i->current_page->textpos]);
@@ -122,11 +124,11 @@ void text_drawchar(gfxdevice_t*dev, gfxfont_t*font, int glyphnr, gfxcolor_t*colo
     }
     int u;
     if(font) {
-	i->lastadvance = font->glyphs[glyphnr].advance*matrix->m00;
-	u = font->glyphs[glyphnr].unicode;
+    i->lastadvance = font->glyphs[glyphnr].advance*matrix->m00;
+    u = font->glyphs[glyphnr].unicode;
     } else {
-	u = glyphnr;
-	i->currentx = 0;i->currenty = 0;
+    u = glyphnr;
+    i->currentx = 0;i->currenty = 0;
     }
     if(u>13) {
         addchar(dev, u);
@@ -151,14 +153,14 @@ int text_result_save(gfxresult_t*r, const char*filename)
 {
     textpage_t*i= (textpage_t*)r->internal;
     if(!i) {
-	return 0; // no pages drawn
+    return 0; // no pages drawn
     }
     FILE*fi = fopen(filename, "wb");
     if(!fi)
-	return 0;
+    return 0;
     while(i) {
-	fwrite(i->text, i->textpos, 1, fi);
-	i = i->next;
+    fwrite(i->text, i->textpos, 1, fi);
+    i = i->next;
     }
     fclose(fi);
     return 1;
@@ -167,33 +169,33 @@ void*text_result_get(gfxresult_t*r, const char*name)
 {
     textpage_t*i= (textpage_t*)r->internal;
     if(!strcmp(name,"text")) {
-	textpage_t*j = i;
-	int len = 0;
-	while(j) {
-	    len += i->textpos;
-	    j = j->next;
-	}
-	char*text = (char*)malloc(len);
-	int pos = 0;
-	j = i;
-	while(j) {
-	    memcpy(&text[pos], i->text, i->textpos);
-	    pos += i->textpos;
-	    j = j->next;
-	}
-	text[pos] = 0;
-	return text;
+    textpage_t*j = i;
+    int len = 0;
+    while(j) {
+        len += i->textpos;
+        j = j->next;
+    }
+    char*text = (char*)malloc(len);
+    int pos = 0;
+    j = i;
+    while(j) {
+        memcpy(&text[pos], i->text, i->textpos);
+        pos += i->textpos;
+        j = j->next;
+    }
+    text[pos] = 0;
+    return text;
     } else if(!strncmp(name,"page",4)) {
-	int pagenr = atoi(&name[4]);
-	if(pagenr<0)
-	    pagenr=0;
-	while(pagenr>0) {
-	    i = i->next;
-	    if(!i)
-		return 0;
-	}
-	i->text[i->textpos] = 0;
-	return strdup(i->text);
+    int pagenr = atoi(&name[4]);
+    if(pagenr<0)
+        pagenr=0;
+    while(pagenr>0) {
+        i = i->next;
+        if(!i)
+        return 0;
+    }
+    i->text[i->textpos] = 0;
+    return strdup(i->text);
     }
     return 0;
 }
@@ -202,10 +204,10 @@ void text_result_destroy(gfxresult_t*r)
     textpage_t*i= (textpage_t*)r->internal;
     r->internal = 0;
     while(i) {
-	textpage_t*next = i->next;
-	free(i->text);i->text = 0;
-	free(i);
-	i = next;
+    textpage_t*next = i->next;
+    free(i->text);i->text = 0;
+    free(i);
+    i = next;
     }
     free(r);
 }
@@ -213,9 +215,9 @@ void text_result_destroy(gfxresult_t*r)
 gfxresult_t* text_finish(struct _gfxdevice*dev)
 {
     internal_t*i = (internal_t*)dev->internal;
-    
+
     gfxresult_t* res = (gfxresult_t*)rfx_calloc(sizeof(gfxresult_t));
-    
+
     res->internal = i->first_page;i->first_page = 0;i->current_page=0;
     res->write = text_result_write;
     res->save = text_result_save;

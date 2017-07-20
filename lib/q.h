@@ -2,9 +2,9 @@
    Header file for q.c.
 
    Part of the swftools package.
-   
+
    Copyright (c) 2001,2002,2003,2004 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -25,6 +25,14 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "mem.h"
+#include "math.h"
+
+#ifndef NAN
+#define __builtin_nan("")
+#endif
+#ifndef INFINITY
+#define __builtin_inf()
+#endif
 
 #ifdef __cplusplus
 extern "C" {

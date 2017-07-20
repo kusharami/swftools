@@ -6,7 +6,7 @@
    Part of the swftools package.
 
    Copyright (c) 2008,2009 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -29,7 +29,14 @@ extern int as3_verbosity;
 extern int as3_pass;
 #define syntaxerror as3_error
 int a3_error(char*s);
-void as3_error(const char*format, ...) __attribute__ ((__noreturn__));
+void as3_error(const char*format, ...)
+#ifdef __GNUC__
+__attribute__ ((__noreturn__))
+#endif
+;
+#ifdef _MSC_VER
+#define __func__ __FUNCTION__
+#endif
 void as3_warning(const char*format, ...);
 void as3_softwarning(const char*format, ...);
 

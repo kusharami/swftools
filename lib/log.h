@@ -1,10 +1,10 @@
-/* log.h 
+/* log.h
    Header file for log.c.
 
    Part of the swftools package.
-   
-   Copyright (c) 2001 Matthias Kramm <kramm@quiss.org> 
- 
+
+   Copyright (c) 2001 Matthias Kramm <kramm@quiss.org>
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -47,8 +47,8 @@ extern void setFileLogging(char*filename, int level, char append);
 extern int maxloglevel;
 extern char char2loglevel[32];
 
-#define msg(fmt,args...) \
-    (((fmt)[0]=='<' && char2loglevel[(fmt)[1]&31]<=maxloglevel)?msg_internal((fmt),## args):0)
+#define msg(fmt,...) \
+	(((fmt)[0]=='<' && char2loglevel[(fmt)[1]&31]<=maxloglevel)?msg_internal((fmt),## __VA_ARGS__):0)
 
 extern int msg_internal(const char* logFormat, ...);
 extern void msg_str(const char* log);

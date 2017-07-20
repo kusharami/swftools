@@ -34,18 +34,18 @@ static inline void add_pixel(renderbuf_t*buf, double x, int y, segment_dir_t dir
     p.dir = dir;
     p.fs = fs;
     p.polygon_nr = polygon_nr;
-    
-    if(y >= buf->bbox.ymax || y < buf->bbox.ymin) 
+
+    if(y >= buf->bbox.ymax || y < buf->bbox.ymin)
         return;
 
     renderline_t*l = &buf->lines[y-buf->bbox.ymin];
 
-    if(l->num == l->size) {
+	if(l->num == l->size) {
 	l->size += 32;
 	l->points = (renderpoint_t*)rfx_realloc(l->points, l->size * sizeof(renderpoint_t));
-    }
-    l->points[l->num] = p;
-    l->num++;
+	}
+	l->points[l->num] = p;
+	l->num++;
 }
 #define CUT 0.5
 static void add_line(renderbuf_t*buf, double x1, double y1, double x2, double y2, edgestyle_t*fs, segment_dir_t dir, int polygon_nr)
@@ -60,8 +60,8 @@ static void add_line(renderbuf_t*buf, double x1, double y1, double x2, double y2
     if(y2 < y1) {
         dir ^= DIR_UP^DIR_DOWN;
         double x,y;
-	x = x1;x1 = x2;x2=x;
-	y = y1;y1 = y2;y2=y;
+    x = x1;x1 = x2;x2=x;
+    y = y1;y1 = y2;y2=y;
     }
 
     diffx = x2 - x1;
@@ -136,7 +136,7 @@ unsigned char* render_polygon(gfxpoly_t*polygon, intbbox_t*bbox, double zoom, wi
     buf->lines = (renderline_t*)rfx_alloc(buf->height*sizeof(renderline_t));
     int y;
     for(y=0;y<buf->height;y++) {
-	memset(&buf->lines[y], 0, sizeof(renderline_t));
+    memset(&buf->lines[y], 0, sizeof(renderline_t));
         buf->lines[y].points = 0;
         buf->lines[y].num = 0;
     }
@@ -145,28 +145,28 @@ unsigned char* render_polygon(gfxpoly_t*polygon, intbbox_t*bbox, double zoom, wi
     int s,t;
     gfxpolystroke_t*stroke = polygon->strokes;
     for(;stroke;stroke=stroke->next) {
-	for(t=0;t<stroke->num_points-1;t++) {
-	    point_t a = stroke->points[t];
-	    point_t b = stroke->points[t+1];
-	    add_line(buf, a.x, a.y, b.x, b.y, stroke->fs, stroke->dir, polygon_nr);
-	}
+    for(t=0;t<stroke->num_points-1;t++) {
+        point_t a = stroke->points[t];
+        point_t b = stroke->points[t+1];
+        add_line(buf, a.x, a.y, b.x, b.y, stroke->fs, stroke->dir, polygon_nr);
+    }
     }
 
-    for(y=0;y<buf->height;y++) {
+	for(y=0;y<buf->height;y++) {
 	renderpoint_t*points = buf->lines[y].points;
-        unsigned char*line = &image[width8*y];
+		unsigned char*line = &image[width8*y];
 	int n;
 	int num = buf->lines[y].num;
-        qsort(points, num, sizeof(renderpoint_t), compare_renderpoints);
-        int lastx = 0;
-        
+		qsort(points, num, sizeof(renderpoint_t), compare_renderpoints);
+		int lastx = 0;
+
         windstate_t fill = rule->start(context);
         for(n=0;n<num;n++) {
             renderpoint_t*p = &points[n];
             int x = (int)(p->x - bbox->xmin);
 
             if(x < lastx)
-                x = lastx; 
+                x = lastx;
             if(x > buf->width)
                 x = buf->width;
 
@@ -180,13 +180,13 @@ unsigned char* render_polygon(gfxpoly_t*polygon, intbbox_t*bbox, double zoom, wi
             /* we're bleeding, fill over padding, too. */
             fprintf(stderr, "Polygon %p is bleeding in line %d\n", polygon, y);
             fill_bitwise(line, lastx, width8*8);
-	    assert(line[width8-1]&0x01);
-	    bleeding = 1;
-	    exit(1);
+        assert(line[width8-1]&0x01);
+        bleeding = 1;
+        exit(1);
 
         }
     }
-    
+
     for(y=0;y<buf->height;y++) {
         if(buf->lines[y].points) {
             free(buf->lines[y].points);
@@ -194,7 +194,7 @@ unsigned char* render_polygon(gfxpoly_t*polygon, intbbox_t*bbox, double zoom, wi
         memset(&buf->lines[y], 0, sizeof(renderline_t));
     }
     if(bleeding) {
-	assert(!bitmap_ok(bbox, image));
+    assert(!bitmap_ok(bbox, image));
     }
     free(buf->lines);buf->lines=0;
     return image;
@@ -202,6 +202,9 @@ unsigned char* render_polygon(gfxpoly_t*polygon, intbbox_t*bbox, double zoom, wi
 
 #define MAX_WIDTH 8192
 #define MAX_HEIGHT 4096
+
+#undef max
+#undef min
 
 static inline double max(double a, double b) {return a>b?a:b;}
 static inline double min(double a, double b) {return a<b?a:b;}
@@ -242,34 +245,34 @@ intbbox_t intbbox_from_polygon(gfxpoly_t*polygon, double zoom)
     int s,t;
     gfxpolystroke_t*stroke = polygon->strokes;
     for(;stroke;stroke=stroke->next) {
-	for(t=0;t<stroke->num_points;t++) {
-	    point_t p = stroke->points[t];
-	    int x1 = floor(p.x);
-	    int y1 = floor(p.y);
-	    int x2 = ceil(p.x);
-	    int y2 = ceil(p.y);
-	    if(x1 < b.xmin) b.xmin = x1;
-	    if(y1 < b.ymin) b.ymin = y1;
-	    if(x2 > b.xmax) b.xmax = x2;
-	    if(y2 > b.ymax) b.ymax = y2;
-	}
+    for(t=0;t<stroke->num_points;t++) {
+        point_t p = stroke->points[t];
+        int x1 = floor(p.x);
+        int y1 = floor(p.y);
+        int x2 = ceil(p.x);
+        int y2 = ceil(p.y);
+        if(x1 < b.xmin) b.xmin = x1;
+        if(y1 < b.ymin) b.ymin = y1;
+        if(x2 > b.xmax) b.xmax = x2;
+        if(y2 > b.ymax) b.ymax = y2;
     }
-    
-    if(b.xmax > (int)(MAX_WIDTH*zoom))
+    }
+
+	if(b.xmax > (int)(MAX_WIDTH*zoom))
 	b.xmax = (int)(MAX_WIDTH*zoom);
-    if(b.ymax > (int)(MAX_HEIGHT*zoom))
+	if(b.ymax > (int)(MAX_HEIGHT*zoom))
 	b.ymax = (int)(MAX_HEIGHT*zoom);
-    if(b.xmin < -(int)(MAX_WIDTH*zoom))
+	if(b.xmin < -(int)(MAX_WIDTH*zoom))
 	b.xmin = -(int)(MAX_WIDTH*zoom);
-    if(b.ymin < -(int)(MAX_HEIGHT*zoom))
+	if(b.ymin < -(int)(MAX_HEIGHT*zoom))
 	b.ymin = -(int)(MAX_HEIGHT*zoom);
-    
-    if(b.xmin > b.xmax) 
+
+	if(b.xmin > b.xmax)
 	b.xmin = b.xmax;
-    if(b.ymin > b.ymax) 
+	if(b.ymin > b.ymax)
 	b.ymin = b.ymax;
-    
-    b.xmax = adjust_x(b.xmin, b.xmax);
+
+	b.xmax = adjust_x(b.xmin, b.xmax);
 
     b.width = b.xmax - b.xmin;
     b.height = b.ymax - b.ymin;
@@ -309,7 +312,7 @@ int bitmap_ok(intbbox_t*bbox, unsigned char*data)
 
 int compare_bitmaps(intbbox_t*bbox, unsigned char*data1, unsigned char*data2)
 {
-    if(!data1 || !data2) 
+    if(!data1 || !data2)
         return 0;
     int x,y;
     int height = bbox->height;
@@ -319,13 +322,13 @@ int compare_bitmaps(intbbox_t*bbox, unsigned char*data1, unsigned char*data2)
     unsigned char*l2 = &data2[width8*2];
     for(y=2;y<height-2;y++) {
         for(x=0;x<width8;x++) {
-            unsigned char a1 = l1[x-width8*2] & l1[x-width8] & l1[x] & 
+            unsigned char a1 = l1[x-width8*2] & l1[x-width8] & l1[x] &
                               l1[x+width8] & l1[x+width8*2];
-            unsigned char b1 = l2[x-width8*2] & l2[x-width8] & l2[x] & 
+            unsigned char b1 = l2[x-width8*2] & l2[x-width8] & l2[x] &
                               l2[x+width8] & l2[x+width8*2];
-            unsigned char a2 = l1[x-width8*2] | l1[x-width8] | l1[x] | 
+            unsigned char a2 = l1[x-width8*2] | l1[x-width8] | l1[x] |
                               l1[x+width8] | l1[x+width8*2];
-            unsigned char b2 = l2[x-width8*2] | l2[x-width8] | l2[x] | 
+            unsigned char b2 = l2[x-width8*2] | l2[x-width8] | l2[x] |
                               l2[x+width8] | l2[x+width8*2];
 
             char fail = 0;

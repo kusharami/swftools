@@ -6,7 +6,7 @@
    Part of the swftools package.
 
    Copyright (c) 2008 Matthias Kramm <kramm@quiss.org>
- 
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -24,11 +24,10 @@
 #include <assert.h>
 #include "pool.h"
 
-
 // ----------------------------- float ----------------------------------
 
 void* float_clone(const void*_v) {
-    if(_v==0) 
+    if(_v==0)
         return 0;
     const double*v1=_v;
     double*v2 = malloc(sizeof(double));
@@ -53,19 +52,19 @@ void float_destroy(void*_v) {
 char float_equals(const void*_v1, const void*_v2) {
     const double*v1=_v1;
     const double*v2=_v2;
-    if(!v1 || !v2) 
+    if(!v1 || !v2)
         return v1==v2;
-    
+
     if(*v1==*v2) return 1;
     if(*v1!=*v1 && *v2!=*v2) return 1; //both values are NaN
     return 0;
 }
 
 type_t float_type = {
-    dup: float_clone,
-    hash: float_hash,
-    free: float_destroy,
-    equals: float_equals
+    float_equals,
+    float_hash,
+    float_clone,
+    float_destroy,
 };
 
 // ----------------------------- uint ----------------------------------
@@ -100,10 +99,10 @@ char uint_equals(const void*_v1, const void*_v2) {
 }
 
 type_t uint_type = {
-    dup: (dup_func)uint_clone,
-    hash: (hash_func)uint_hash,
-    free: (free_func)uint_destroy,
-    equals: (equals_func)uint_equals
+    (equals_func)uint_equals,
+    (hash_func)uint_hash,
+    (dup_func)uint_clone,
+    (free_func)uint_destroy,
 };
 
 // ----------------------------- namespace ----------------------------------
@@ -158,11 +157,11 @@ char*escape_string(const char*str)
         } else if(*s<32) {
             if(*s==13)
                 dest+=sprintf(dest, "\\r");
-            else if(*s==10) 
+            else if(*s==10)
                 dest+=sprintf(dest, "\\n");
-            else if(*s==9) 
+            else if(*s==9)
                 dest+=sprintf(dest, "\\t");
-            else 
+            else
                 dest+=sprintf(dest, "\\%2o", *s);
         } else if(*s<127) {
             *dest++=*s;
@@ -188,7 +187,7 @@ char* namespace_tostring(namespace_t*ns)
         sprintf(string, "[%s]NULL", access);
     else if(!*s)
         sprintf(string, "[%s]\"\"", access);
-    else 
+    else
         sprintf(string, "[%s]%s", access, s);
     free(s);
     return string;
@@ -282,10 +281,10 @@ void namespace_destroy(namespace_t*n)
 }
 
 type_t namespace_type = {
-    dup: (dup_func)namespace_clone,
-    hash: (hash_func)namespace_hash,
-    free: (free_func)namespace_destroy,
-    equals: (equals_func)namespace_equals
+    (equals_func)namespace_equals,
+    (hash_func)namespace_hash,
+    (dup_func)namespace_clone,
+    (free_func)namespace_destroy,
 };
 
 // ---------------------------namespace sets --------------------------------
@@ -391,10 +390,10 @@ void namespace_set_destroy(namespace_set_t*set)
 }
 
 type_t namespace_set_type = {
-    dup: (dup_func)namespace_set_clone,
-    hash: (hash_func)namespace_set_hash,
-    free: (free_func)namespace_set_destroy,
-    equals: (equals_func)namespace_set_equals
+    (equals_func)namespace_set_equals,
+    (hash_func)namespace_set_hash,
+    (dup_func)namespace_set_clone,
+    (free_func)namespace_set_destroy,
 };
 
 // ----------------------------- multiname ----------------------------------
@@ -528,12 +527,12 @@ char* multiname_tostring(multiname_t*m)
         strcpy(mname, "<q");
         if(m->type == QNAMEA)
             strcat(mname, ",attr");
-	strcat(mname, ">");
-	if(m->ns) {
-	    strcat(mname,"[");
-	    strcat(mname,access2str(m->ns->access));
-	    strcat(mname, "]");
-	}
+    strcat(mname, ">");
+    if(m->ns) {
+        strcat(mname,"[");
+        strcat(mname,access2str(m->ns->access));
+        strcat(mname, "]");
+    }
         strcat(mname, nsname);
         free(nsname);
         strcat(mname, "::");
@@ -541,7 +540,7 @@ char* multiname_tostring(multiname_t*m)
     } else if(m->type==RTQNAME || m->type==RTQNAMEA) {
         mname = malloc(namelen+32);
         strcpy(mname, "<rt");
-        if(m->type == RTQNAMEA) 
+        if(m->type == RTQNAMEA)
             strcat(mname, ",attr");
         strcat(mname, ">");
         strcat(mname, name);
@@ -587,12 +586,12 @@ multiname_t* multiname_fromstring(const char*name2)
         if(strchr(n, ':')) {
             fprintf(stderr, "Error: single ':' in name\n");
         }
-	namespace = "";
-	name = n;
+    namespace = "";
+    name = n;
     } else {
-	*p = 0;
-	namespace = n;
-	name = p+2;
+    *p = 0;
+    namespace = n;
+    name = p+2;
         if(strchr(namespace, ':')) {
             fprintf(stderr, "Error: single ':' in namespace\n");
         }
@@ -629,10 +628,10 @@ void multiname_destroy(multiname_t*m)
 }
 
 type_t multiname_type = {
-    dup: (dup_func)multiname_clone,
-    hash: (hash_func)multiname_hash,
-    free: (free_func)multiname_destroy,
-    equals: (equals_func)multiname_equals
+    (equals_func)multiname_equals,
+    (hash_func)multiname_hash,
+    (dup_func)multiname_clone,
+    (free_func)multiname_destroy,
 };
 
 
@@ -640,7 +639,7 @@ type_t multiname_type = {
 
 #define UNIQUE_CONSTANT(x) ((x) == CONSTANT_TRUE || (x) == CONSTANT_FALSE || (x) == CONSTANT_NULL || (x) == CONSTANT_UNDEFINED)
 
-constant_t* constant_new_int(int i) 
+constant_t* constant_new_int(int i)
 {
     NEW(constant_t,c);
     c->i = i;
@@ -725,7 +724,7 @@ constant_t* constant_fromindex(pool_t*pool, int index, int type)
         /* even for nonvalued constants (like TRUE/FALSE etc.), a nonzero
            index is present to indicate that a type is coming */
         return 0;
-    } 
+    }
     NEW(constant_t,c);
     c->type = type;
     if(NS_TYPE(c->type)) {
@@ -779,7 +778,7 @@ char* constant_tostring(constant_t*c)
         return 0;
     }
 }
-char constant_has_index(constant_t*c) 
+char constant_has_index(constant_t*c)
 {
     if(!c)
         return 0;
@@ -805,7 +804,7 @@ int constant_get_index(pool_t*pool, constant_t*c)
     } else if(c->type == CONSTANT_STRING) {
         return pool_register_string2(pool, c->s);
     } else if(c->type == CONSTANT_UNDEFINED) {
-        /* write undefined with index 0 (and no type). Otherwise, the FlashPlayer 
+        /* write undefined with index 0 (and no type). Otherwise, the FlashPlayer
            seems to throw an "attempt to read out of bounds" exception */
         return 0;
     } else if(!constant_has_index(c)) {
@@ -832,7 +831,8 @@ static int array_append_or_increase(array_t*array, void*key)
 {
     int pos = array_find(array, key);
     if(pos>=0) {
-        array->d[pos].data++;
+        char **data_ptr = &array->d[pos].data;
+        ++*data_ptr;
         return pos;
     } else {
         return array_append(array, key, 0);
@@ -842,7 +842,7 @@ static int compare_arrayentry(const void*_c1, const void*_c2)
 {
     const array_entry_t*c1 = _c1;
     const array_entry_t*c2 = _c2;
-    return c2->data - c1->data;
+    return (const char *)c2->data - (const char *)c1->data;
 }
 
 static void* nodup(const void*o) {return (void*)o;}
@@ -1025,10 +1025,10 @@ unsigned int pool_lookup_uint(pool_t*pool, int i)
 }
 double pool_lookup_float(pool_t*pool, int i)
 {
-    if(!i) return __builtin_nan("");
+    if(!i) return NAN;
     double*ptr = (double*)array_getkey(pool->x_floats, i);
-    if(!ptr) 
-	return  __builtin_nan("");
+    if(!ptr)
+    return NAN;
     return *ptr;
 }
 const char*pool_lookup_string(pool_t*pool, int i)
@@ -1069,7 +1069,7 @@ pool_t*pool_new()
     p->x_multinames = array_new2(&multiname_type);
 
     /* add a zero-index entry in each list */
-  
+
     array_append(p->x_ints, 0, 0);
     array_append(p->x_uints, 0, 0);
     array_append(p->x_floats, 0, 0);
@@ -1112,7 +1112,7 @@ void pool_read(pool_t*pool, TAG*tag)
         DEBUG printf("uint %d) %d\n", t, v);
         array_append(pool->x_uints, &v, 0);
     }
-    
+
     int num_floats = swf_GetU30(tag);
     DEBUG printf("%d floats\n", num_floats);
     for(t=1;t<num_floats;t++) {
@@ -1120,27 +1120,27 @@ void pool_read(pool_t*pool, TAG*tag)
         DEBUG printf("float %d) %f\n", t, d);
         array_append(pool->x_floats, &d, 0);
     }
-    
+
     int num_strings = swf_GetU30(tag);
     DEBUG printf("%d strings\n", num_strings);
     for(t=1;t<num_strings;t++) {
-	int len = swf_GetU30(tag);
+    int len = swf_GetU30(tag);
         string_t s = string_new((char*)&tag->data[tag->pos], len);
-	swf_GetBlock(tag, 0, len);
-	array_append(pool->x_strings, &s, 0);
-	DEBUG printf("%d) \"%s\"\n", t, ((string_t*)array_getkey(pool->x_strings, t))->str);
+    swf_GetBlock(tag, 0, len);
+    array_append(pool->x_strings, &s, 0);
+    DEBUG printf("%d) \"%s\"\n", t, ((string_t*)array_getkey(pool->x_strings, t))->str);
     }
     int num_namespaces = swf_GetU30(tag);
     DEBUG printf("%d namespaces\n", num_namespaces);
     for(t=1;t<num_namespaces;t++) {
-	U8 type = swf_GetU8(tag);
-	int namenr = swf_GetU30(tag);
-	const char*name = 0; 
+    U8 type = swf_GetU8(tag);
+    int namenr = swf_GetU30(tag);
+    const char*name = 0;
         if(namenr)
             name = pool_lookup_string(pool, namenr);
         namespace_t*ns = namespace_new(type, name);
-	array_append(pool->x_namespaces, ns, 0);
-	DEBUG printf("%d) %02x \"%s\"\n", t, type, namespace_tostring(ns));
+    array_append(pool->x_namespaces, ns, 0);
+    DEBUG printf("%d) %02x \"%s\"\n", t, type, namespace_tostring(ns));
         namespace_destroy(ns);
     }
     int num_sets = swf_GetU30(tag);
@@ -1148,7 +1148,7 @@ void pool_read(pool_t*pool, TAG*tag)
     for(t=1;t<num_sets;t++) {
         int count = swf_GetU30(tag);
         int s;
-        
+
         NEW(namespace_set_t, nsset);
         for(s=0;s<count;s++) {
             int nsnr = swf_GetU30(tag);
@@ -1167,7 +1167,7 @@ void pool_read(pool_t*pool, TAG*tag)
     for(t=1;t<num_multinames;t++) {
         multiname_t m;
         memset(&m, 0, sizeof(multiname_t));
-        
+
         /*int s;
         for(s=0;s<8;s++)
             printf("0x%02x ", tag->data[tag->pos+s]);
@@ -1175,41 +1175,41 @@ void pool_read(pool_t*pool, TAG*tag)
 
 	m.type = swf_GetU8(tag);
 	if(m.type==0x07 || m.type==0x0d) {
-	    int namespace_index = swf_GetU30(tag);
-            m.ns = (namespace_t*)array_getkey(pool->x_namespaces, namespace_index);
-	    if(!m.ns) {
+		int namespace_index = swf_GetU30(tag);
+			m.ns = (namespace_t*)array_getkey(pool->x_namespaces, namespace_index);
+		if(!m.ns) {
 		fprintf(stderr, "Error: Illegal reference to namespace #%d in constant pool.\n", namespace_index);
-	    }
-            int name_index = swf_GetU30(tag);
-            if(name_index) // 0 = '*' (any)
-	        m.name = pool_lookup_string(pool, name_index);
+		}
+			int name_index = swf_GetU30(tag);
+			if(name_index) // 0 = '*' (any)
+			m.name = pool_lookup_string(pool, name_index);
 	} else if(m.type==0x0f || m.type==0x10) {
-            int name_index = swf_GetU30(tag);
-            if(name_index) // 0 = '*' (any name)
-	        m.name = pool_lookup_string(pool, name_index);
+			int name_index = swf_GetU30(tag);
+			if(name_index) // 0 = '*' (any name)
+			m.name = pool_lookup_string(pool, name_index);
 	} else if(m.type==0x11 || m.type==0x12) {
 	} else if(m.type==0x09 || m.type==0x0e) {
-            int name_index = swf_GetU30(tag);
-            int namespace_set_index = swf_GetU30(tag);
-            if(name_index)
-	        m.name = pool_lookup_string(pool, name_index);
-	    m.namespace_set = (namespace_set_t*)array_getkey(pool->x_namespace_sets, namespace_set_index);
-        } else if(m.type==0x1b || m.type==0x1c) {
-            int namespace_set_index = swf_GetU30(tag);
-	    m.namespace_set = (namespace_set_t*)array_getkey(pool->x_namespace_sets, namespace_set_index);
-        } else if(m.type==0x1d) {
-            int v1 = swf_GetU30(tag); //multiname
-            int v2 = swf_GetU30(tag); //counter?
-            int v3 = swf_GetU30(tag); //multiname
-            // e.g. Vector<int> ... we only store the parent object
-            m = *(multiname_t*)array_getkey(pool->x_multinames, v1);
+			int name_index = swf_GetU30(tag);
+			int namespace_set_index = swf_GetU30(tag);
+			if(name_index)
+			m.name = pool_lookup_string(pool, name_index);
+		m.namespace_set = (namespace_set_t*)array_getkey(pool->x_namespace_sets, namespace_set_index);
+		} else if(m.type==0x1b || m.type==0x1c) {
+			int namespace_set_index = swf_GetU30(tag);
+		m.namespace_set = (namespace_set_t*)array_getkey(pool->x_namespace_sets, namespace_set_index);
+		} else if(m.type==0x1d) {
+			int v1 = swf_GetU30(tag); //multiname
+			int v2 = swf_GetU30(tag); //counter?
+			int v3 = swf_GetU30(tag); //multiname
+			// e.g. Vector<int> ... we only store the parent object
+			m = *(multiname_t*)array_getkey(pool->x_multinames, v1);
 	} else {
-	    printf("can't parse type %d multinames yet\n", m.type);
+		printf("can't parse type %d multinames yet\n", m.type);
 	}
-        DEBUG printf("multiname %d) %s\n", t, multiname_tostring(&m));
+		DEBUG printf("multiname %d) %s\n", t, multiname_tostring(&m));
 	array_append(pool->x_multinames, &m, 0);
-    }
-} 
+	}
+}
 
 void pool_dump(pool_t*pool, FILE*fo, char flags)
 {
@@ -1242,7 +1242,7 @@ void pool_dump(pool_t*pool, FILE*fo, char flags)
     }
     fprintf(fo, "%d namespaces\n", pool->x_namespaces->num);
     for(t=1;t<pool->x_namespaces->num;t++) {
-	namespace_t*ns= (namespace_t*)array_getkey(pool->x_namespaces, t);
+    namespace_t*ns= (namespace_t*)array_getkey(pool->x_namespaces, t);
         char*s = namespace_tostring(ns);
         int freq = (int)(ptroff_t)array_getvalue(pool->x_namespaces, t);
         if(flags&1) fprintf(fo, "%5d %d) %s\n", freq, t, s);
@@ -1259,18 +1259,18 @@ void pool_dump(pool_t*pool, FILE*fo, char flags)
 
     fprintf(fo, "%d multinames\n", pool->x_multinames->num);
     for(t=1;t<pool->x_multinames->num;t++) {
-	multiname_t*m = (multiname_t*)array_getkey(pool->x_multinames, t);
+    multiname_t*m = (multiname_t*)array_getkey(pool->x_multinames, t);
         char*s = multiname_tostring(m);
         int freq = (int)(ptroff_t)array_getvalue(pool->x_multinames, t);
         if(flags&1) fprintf(fo, "%5d %d) %s\n", freq, t, s);
         free(s);
     }
-} 
+}
 
 void pool_write(pool_t*pool, TAG*tag)
 {
     int t;
-    
+
     /* make sure that all namespaces used by multinames / namespace sets
        and all strings used by namespaces exist */
 
@@ -1295,7 +1295,7 @@ void pool_write(pool_t*pool, TAG*tag)
         }
     }
     for(t=1;t<pool->x_namespaces->num;t++) {
-	namespace_t*ns= (namespace_t*)array_getkey(pool->x_namespaces, t);
+    namespace_t*ns= (namespace_t*)array_getkey(pool->x_namespaces, t);
         /*  The spec says (page 22): "a value of zero denotes an empty string".
             However when actually using zero strings as empty namespaces, the
             flash player breaks.*/
@@ -1306,7 +1306,7 @@ void pool_write(pool_t*pool, TAG*tag)
     //pool_register_int(pool, 15);
     //pool_register_int(pool, 1);
     //pool_register_int(pool, 0);
-    
+
     /* write data */
     swf_SetU30(tag, pool->x_ints->num>1?pool->x_ints->num:0);
     for(t=1;t<pool->x_ints->num;t++) {
@@ -1325,24 +1325,24 @@ void pool_write(pool_t*pool, TAG*tag)
     swf_SetU30(tag, pool->x_strings->num>1?pool->x_strings->num:0);
     for(t=1;t<pool->x_strings->num;t++) {
         string_t str = pool_lookup_string2(pool, t);
-	swf_SetU30String(tag, str.str, str.len);
+    swf_SetU30String(tag, str.str, str.len);
     }
     swf_SetU30(tag, pool->x_namespaces->num>1?pool->x_namespaces->num:0);
     for(t=1;t<pool->x_namespaces->num;t++) {
-	namespace_t*ns= (namespace_t*)array_getkey(pool->x_namespaces, t);
-	swf_SetU8(tag, ns->access);
-	const char*name = ns->name;
-	int i = 0;
-        
+    namespace_t*ns= (namespace_t*)array_getkey(pool->x_namespaces, t);
+    swf_SetU8(tag, ns->access);
+    const char*name = ns->name;
+    int i = 0;
+
         //if(name && name[0])
         i = pool_find_string(pool, name);
 
-	swf_SetU30(tag, i);
+    swf_SetU30(tag, i);
     }
     swf_SetU30(tag, pool->x_namespace_sets->num>1?pool->x_namespace_sets->num:0);
     for(t=1;t<pool->x_namespace_sets->num;t++) {
         namespace_set_t*set = (namespace_set_t*)array_getkey(pool->x_namespace_sets, t);
-        namespace_list_t*i = set->namespaces; 
+        namespace_list_t*i = set->namespaces;
         int len = list_length(i);
         swf_SetU30(tag, len);
         while(i) {
@@ -1354,34 +1354,34 @@ void pool_write(pool_t*pool, TAG*tag)
 
     swf_SetU30(tag, pool->x_multinames->num>1?pool->x_multinames->num:0);
     for(t=1;t<pool->x_multinames->num;t++) {
-	multiname_t*m = (multiname_t*)array_getkey(pool->x_multinames, t);
-	swf_SetU8(tag, m->type);
+    multiname_t*m = (multiname_t*)array_getkey(pool->x_multinames, t);
+    swf_SetU8(tag, m->type);
 
         if(m->ns) {
             assert(m->type==0x07 || m->type==0x0d);
-	    int i = pool_find_namespace(pool, m->ns);
+        int i = pool_find_namespace(pool, m->ns);
             if(i<0) fprintf(stderr, "internal error: unregistered namespace %02x %s %s\n", m->ns->access, access2str(m->ns->access), m->ns->name);
-	    swf_SetU30(tag, i);
+        swf_SetU30(tag, i);
         } else {
             assert(m->type!=0x07 && m->type!=0x0d);
         }
-	
+
         if(m->name) {
             assert(m->type==0x09 || m->type==0x0e || m->type==0x07 || m->type==0x0d || m->type==0x0f || m->type==0x10);
-	    int i = pool_find_string(pool, m->name);
+        int i = pool_find_string(pool, m->name);
             if(i<0) fprintf(stderr, "internal error: unregistered name\n");
-	    swf_SetU30(tag, i);
+        swf_SetU30(tag, i);
         } else {
-	    if(m->type == 0x09) {
-		swf_SetU30(tag, 0);
-	    }
+        if(m->type == 0x09) {
+        swf_SetU30(tag, 0);
+        }
             assert(m->type!=0x0e && m->type!=0x07 && m->type!=0x0d && m->type!=0x0f && m->type!=0x10);
         }
         if(m->namespace_set) {
             assert(m->type==0x09 || m->type==0x0e || m->type==0x1c || m->type==0x1b);
-	    int i = pool_find_namespace_set(pool, m->namespace_set);
+        int i = pool_find_namespace_set(pool, m->namespace_set);
             if(i<0) fprintf(stderr, "internal error: unregistered namespace set\n");
-	    swf_SetU30(tag, i);
+        swf_SetU30(tag, i);
         } else {
             assert(m->type!=0x09 && m->type!=0x0e && m->type!=0x1c && m->type!=0x1b);
         }

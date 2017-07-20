@@ -2,8 +2,8 @@
 
    Part of the swftools package.
 
-   Copyright (c) 2010 Matthias Kramm <kramm@quiss.org> 
- 
+   Copyright (c) 2010 Matthias Kramm <kramm@quiss.org>
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -81,15 +81,15 @@ gfxfilterchain_t* gfxfilterchain_parse(const char*filterexpr);
 gfxdevice_t* gfxfilterchain_apply(gfxfilterchain_t*chain, gfxdevice_t*dev);
 void gfxfilterchain_destroy(gfxfilterchain_t*chain);
 
-#define wrap_filter(dev, name, args...) \
+#define wrap_filter(dev, name, ...) \
     {gfxfilter_t f_##name; \
-     gfxfilter_##name##_init(&f_##name, ## args); \
+     gfxfilter_##name##_init(&f_##name, ## __VA_ARGS__); \
      dev = gfxfilter_apply(&f_##name, dev); \
     }
 
-#define wrap_filter2(dev, name, args...) \
+#define wrap_filter2(dev, name, ...) \
     {gfxtwopassfilter_t f_##name; \
-     gfxtwopassfilter_##name##_init(&f_##name, ## args); \
+     gfxtwopassfilter_##name##_init(&f_##name, ## __VA_ARGS__); \
      dev = gfxtwopassfilter_apply(&f_##name, dev); \
     }
 
